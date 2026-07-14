@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-
   "exports": {
     ".": "./src/AppProvider.tsx"
   },
-
   "dependencies": {
     "@todo/design-system": "workspace:*",
     "react": "^19"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
   }
 }

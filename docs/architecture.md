@@ -43,7 +43,9 @@ The goal is to build a scalable application that remains simple to maintain, min
 
 - Supabase
 - PostgreSQL
-- Supabase Auth
+- Supabase Auth using publishable client keys
+- Client applications use Supabase publishable keys.
+- Secret keys are never exposed to mobile/web applications.
 - Supabase Realtime
 
 ## State Management

@@ -382,6 +382,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.7.0(jiti@2.6.1))
+      '@types/node':
+        specifier: ^26.1.1
+        version: 26.1.1
       '@types/react':
         specifier: ~19.2.17
         version: 19.2.17
@@ -403,6 +406,12 @@ importers:
       prettier:
         specifier: ^3.9.5
         version: 3.9.5
+      react:
+        specifier: 19.2.3
+        version: 19.2.3
+      react-native:
+        specifier: 0.86.0
+        version: 0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3)
       turbo:
         specifier: ^2.10.4
         version: 2.10.4
@@ -539,6 +548,8 @@ importers:
         specifier: workspace:*
         version: link:../ui
 
+  packages/config: {}
+
   packages/design-system:
     dependencies:
       '@tamagui/config':
@@ -553,11 +564,18 @@ importers:
       react:
         specifier: ^19
         version: 19.2.3
+      react-native:
+        specifier: 0.86.0
+        version: 0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3)
       tamagui:
         specifier: ^2.4.5
         version: 2.4.5(react-dom@19.2.3(react@19.2.3))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
 
-  packages/supabase: {}
+  packages/supabase:
+    dependencies:
+      '@todo/config':
+        specifier: workspace:*
+        version: link:../config
 
   packages/tasks:
     dependencies:

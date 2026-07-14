@@ -12,5 +12,8 @@
     "react": "^19",
     "react-native-safe-area-context": "~5.7.0",
     "tamagui": "^2.4.5"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
   }
 }

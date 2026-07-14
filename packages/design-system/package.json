@@ -11,6 +11,10 @@
     "@tamagui/font-inter": "^2.4.5",
     "@tamagui/themes": "^2.4.5",
     "react": "^19",
+    "react-native": "0.86.0",
     "tamagui": "^2.4.5"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
   }
 }

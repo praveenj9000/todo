@@ -10,5 +10,8 @@
     "@todo/ui": "workspace:*",
     "@todo/types": "workspace:*",
     "@todo/supabase": "workspace:*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
   }
 }
