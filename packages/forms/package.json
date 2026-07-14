@@ -1,0 +1,18 @@
+{
+  "name": "@todo/forms",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5",
+    "react": "^19",
+    "react-hook-form": "^7",
+    "zod": "^4"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

@@ -10,38 +10,52 @@ export const authService = {
     return supabase.auth.getSession();
   },
 
+  getUser() {
+    return supabase.auth.getUser();
+  },
+
   onAuthStateChange(
     callback: (
       event: AuthChangeEvent,
       session: Session | null
     ) => void
   ) {
-    return supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        callback(event, session);
-      }
-    );
+    return supabase.auth.onAuthStateChange(callback);
   },
 
   signOut() {
     return supabase.auth.signOut();
   },
 
-  signIn(email: string, password: string) {
+  loginWithEmail(email: string, password: string) {
     return supabase.auth.signInWithPassword({
       email,
       password,
     });
   },
 
-  signUp(email: string, password: string) {
+  signupWithEmail(email: string, password: string) {
     return supabase.auth.signUp({
       email,
       password,
     });
   },
 
-  resetPassword(email: string) {
+  requestPasswordReset(email: string) {
     return supabase.auth.resetPasswordForEmail(email);
-  }
+  },
+
+  updatePassword() { },
+
+  changePassword() { },
+
+  verifyResetToken() { },
+
+  resendVerificationEmail() { },
+
+  loginWithGoogle() { },
+
+  loginWithApple() { },
+
+  loginWithGithub() { }
 };

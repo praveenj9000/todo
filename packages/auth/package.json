@@ -7,11 +7,15 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.4.0",
     "@supabase/supabase-js": "^2.110.2",
     "@todo/supabase": "workspace:*",
     "@todo/types": "workspace:*",
     "@todo/ui": "workspace:*",
-    "react": "^19"
+    "@todo/forms": "workspace:*",
+    "react": "^19",
+    "react-hook-form": "^7.81.0",
+    "zod": "^4.4.3"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
