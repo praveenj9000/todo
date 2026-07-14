@@ -1,5 +1,5 @@
 {
-  "name": "@todo/supabase",
+  "name": "@todo/env",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -7,10 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.110.2",
-    "@todo/config": "workspace:*",
-    "@todo/types": "workspace:*",
-    "@todo/env": "workspace:*"
+    "@types/node": "^24"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
