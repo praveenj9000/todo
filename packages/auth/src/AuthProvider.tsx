@@ -1,20 +1,16 @@
 import {
   createContext,
-  useContext,
   useEffect,
   useState,
   type PropsWithChildren,
 } from "react";
-
-import {
-  supabase,
-} from "@todo/supabase";
 
 import type {
   User,
   Session,
 } from "@supabase/supabase-js";
 
+import { authService } from "./services/auth.service";
 
 type AuthContextType = {
   user: User | null;
@@ -24,12 +20,10 @@ type AuthContextType = {
   signOut: () => Promise<void>;
 };
 
-
 export const AuthContext =
   createContext<AuthContextType | undefined>(
     undefined
   );
-
 
 export function AuthProvider({
   children,
@@ -44,27 +38,15 @@ export function AuthProvider({
 
   useEffect(() => {
 
-    supabase.auth
-      .getSession()
+    authService.getSession()
       .then(({ data }) => {
-
         setSession(data.session);
         setLoading(false);
-
       });
 
-
-    const {
-      data: listener,
-    } =
-      supabase.auth.onAuthStateChange(
-        (_event, session) => {
-
-          setSession(session);
-
-        }
-      );
-
+    const { data: listener } = authService.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
 
     return () => {
       listener.subscription.unsubscribe();
@@ -72,22 +54,16 @@ export function AuthProvider({
 
   }, []);
 
-
   async function signOut() {
-    await supabase.auth.signOut();
+    await authService.signOut();
   }
-
 
   return (
     <AuthContext.Provider
       value={{
-        user:
-          session?.user ?? null,
-
+        user:session?.user ?? null,
         session,
-
         loading,
-
         signOut,
       }}
     >
