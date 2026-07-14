@@ -1,10 +1,25 @@
-import type { PropsWithChildren } from "react";
-import { DesignSystemProvider } from "@todo/design-system";
+import type {
+  PropsWithChildren,
+} from "react";
 
-export function AppProvider({ children }: PropsWithChildren) {
-    return (
-        <DesignSystemProvider>
-            {children}
-        </DesignSystemProvider>
-    );
+import {
+  AuthProvider,
+} from "@todo/auth";
+
+import {
+  DesignSystemProvider,
+} from "@todo/design-system";
+
+
+export function AppProvider({
+  children,
+}: PropsWithChildren) {
+
+  return (
+    <AuthProvider>
+      <DesignSystemProvider>
+        {children}
+      </DesignSystemProvider>
+    </AuthProvider>
+  );
 }

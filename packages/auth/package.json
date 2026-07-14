@@ -7,9 +7,11 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@todo/ui": "workspace:*",
+    "@supabase/supabase-js": "^2.110.2",
+    "@todo/supabase": "workspace:*",
     "@todo/types": "workspace:*",
-    "@todo/supabase": "workspace:*"
+    "@todo/ui": "workspace:*",
+    "react": "^19"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

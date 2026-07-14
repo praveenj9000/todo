@@ -527,6 +527,9 @@ importers:
 
   packages/app-provider:
     dependencies:
+      '@todo/auth':
+        specifier: workspace:*
+        version: link:../auth
       '@todo/design-system':
         specifier: workspace:*
         version: link:../design-system
@@ -538,6 +541,9 @@ importers:
 
   packages/auth:
     dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.110.2
+        version: 2.110.2
       '@todo/supabase':
         specifier: workspace:*
         version: link:../supabase
@@ -547,6 +553,9 @@ importers:
       '@todo/ui':
         specifier: workspace:*
         version: link:../ui
+      react:
+        specifier: ^19
+        version: 19.2.3
 
   packages/config: {}
 
