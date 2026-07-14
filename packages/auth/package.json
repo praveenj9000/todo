@@ -1,0 +1,14 @@
+{
+  "name": "@todo/auth",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@todo/ui": "workspace:*",
+    "@todo/types": "workspace:*",
+    "@todo/supabase": "workspace:*"
+  }
+}

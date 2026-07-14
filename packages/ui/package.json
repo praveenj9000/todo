@@ -1,0 +1,16 @@
+{
+  "name": "@todo/ui",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@todo/design-system": "workspace:*",
+    "@todo/types": "workspace:*",
+    "react": "^19",
+    "react-native-safe-area-context": "~5.7.0",
+    "tamagui": "^2.4.5"
+  }
+}

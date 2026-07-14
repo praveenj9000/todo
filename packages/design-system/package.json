@@ -1,0 +1,16 @@
+{
+  "name": "@todo/design-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@tamagui/config": "^2.4.5",
+    "@tamagui/font-inter": "^2.4.5",
+    "@tamagui/themes": "^2.4.5",
+    "react": "^19",
+    "tamagui": "^2.4.5"
+  }
+}
