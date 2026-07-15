@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, zodResolver } from "@todo/forms";
 import { authService } from "../services/auth.service";
 import type { LoginForm } from "../types";
 import { LoginSchema } from "../validation/auth.schema";
@@ -17,9 +16,10 @@ export function useLogin() {
       password: "",
     },
     mode: "onSubmit",
+    reValidateMode: "onChange"
   });
 
-  const onSubmit = form.handleSubmit(async (values) => {
+  const login = form.handleSubmit(async (values) => {
     try {
       setLoading(true);
       setError(null);
@@ -37,10 +37,13 @@ export function useLogin() {
     }
   });
 
+  const clearError = () => setError(null);
+
   return {
     form,
+    login,
     loading,
     error,
-    onSubmit,
+    clearError
   };
 }
