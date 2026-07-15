@@ -37,7 +37,12 @@ The goal is to build a scalable application that remains simple to maintain, min
 - Expo
 - Expo Router
 - TypeScript
-- Tamagui
+
+## UI Layer
+
+- @todo/styling (styling abstraction)
+- @todo/design-system (tokens, themes, fonts)
+- Tamagui (implementation detail)
 
 ## Backend
 
@@ -74,11 +79,79 @@ apps/
 packages/
 docs/
 supabase/
+
+packages/
+    app-provider/
+    assets/
+    auth/
+    config/
+    design-system/
+    env/
+    forms/
+    icons/
+    styling/
+    supabase/
+    tasks/
+    types/
+    ui/
 ```
 
 ---
 
 # Package Responsibilities
+
+## @todo/styling
+
+Responsible for the styling abstraction layer.
+
+Responsibilities:
+
+- Wraps the underlying styling library
+- Exposes stable UI primitives
+- Consumes design-system tokens
+- Shields the rest of the application from implementation details
+
+Only this package knows that Tamagui is used.
+
+## @todo/forms
+
+Responsible for shared form infrastructure.
+
+Responsibilities:
+
+- React Hook Form utilities
+- Zod integration
+- Shared form hooks
+- Validation helpers
+
+## @todo/env
+
+Responsible for reading and validating environment variables.
+
+Responsibilities:
+
+- Type-safe environment access
+- Runtime validation
+
+## @todo/icons
+
+Shared icon exports.
+
+This package isolates icon libraries from the rest of the application.
+
+## @todo/assets
+
+Shared application assets.
+
+Examples:
+
+- Images
+- SVGs
+- Fonts
+
+## @todo/config
+
+Shared configuration used across packages.
 
 ## @todo/design-system
 
@@ -96,21 +169,16 @@ This package contains **design infrastructure only**.
 
 ## @todo/ui
 
-Responsible for:
+Responsible for reusable application UI components.
 
-- UI primitives
-- Reusable components
+Responsibilities:
+
 - Layout components
+- Form components
+- Feedback components
+- Display components
 
-Examples:
-
-- Screen
-- Text
-- Button
-- Card
-- TextField
-
-Feature packages should import UI from this package.
+This package builds upon @todo/styling.
 
 ---
 
@@ -140,10 +208,10 @@ Planned contents:
 
 - Components
 - Hooks
+- Providers
 - Services
-- Schemas
+- Validation
 - Types
-- Screens
 
 ---
 
@@ -153,12 +221,12 @@ Responsible for task management.
 
 Planned contents:
 
-- Components
-- Services
 - Hooks
-- Schemas
+- Services
+- Validation
 - Types
 - Offline synchronization
+- Realtime synchronization
 
 ---
 
@@ -188,20 +256,33 @@ apps
     ↓
 ui
     ↓
+styling
+    ↓
 design-system
+    ↓
+Tamagui
 ```
 
 Business features:
 
 ```
 apps
-      ↓
-auth
-tasks
-      ↓
-ui
-      ↓
+│
+├── auth
+├── tasks
+│
+├──────────────┐
+│              │
+▼              ▼
+ui         supabase
+│              │
+└──────┬───────┘
+       ▼
+   styling
+       ▼
 design-system
+       ▼
+   Tamagui
 ```
 
 Rules:
@@ -214,6 +295,18 @@ Rules:
 - Avoid circular dependencies.
 
 ---
+# Architectural Rules
+
+- Apps own navigation.
+- Apps own routing.
+- Apps compose features.
+- Feature packages never import from apps.
+- UI components never contain business logic.
+- Styling components never contain business logic.
+- Design-system contains tokens only.
+- Only @todo/styling may depend on Tamagui.
+- UI components consume @todo/styling.
+- Business logic communicates with Supabase only through services.
 
 # UI Architecture
 
@@ -266,17 +359,13 @@ Authentication providers:
 # Data Layer (Planned)
 
 Supabase
-
-↓
-
-Repository Layer
-
-↓
-
+        ↓
+@todo/supabase
+        ↓
+Feature Service
+        ↓
 TanStack Query
-
-↓
-
+        ↓
 UI
 
 The UI should never communicate directly with Supabase.
@@ -310,23 +399,34 @@ Planned:
 Completed:
 
 - Monorepo
-- Turbo
-- pnpm Workspace
+- pnpm Workspaces
+- Turborepo
 - Expo
 - Expo Router
+- Supabase project
+- Database migrations
+- Row-Level Security
 - Design System
-- UI package
-- App Provider
-- Initial UI primitives
+- Styling abstraction
+- UI component library (foundation)
+- Forms package
+- Authentication package (foundation)
+- Environment package
+- Shared types
+- App provider
 
 In Progress:
 
-- Backend integration
+- Authentication UI
+- Authentication flows
 
 Upcoming:
 
-- Supabase
-- Authentication
-- Database
-- Tasks
-- Offline synchronization
+- Google Sign-In
+- Apple Sign-In
+- Task management
+- Realtime synchronization
+- Offline support
+- TanStack Query integration
+- Testing
+- CI/CD

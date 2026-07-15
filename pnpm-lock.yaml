@@ -566,9 +566,6 @@ importers:
       '@todo/types':
         specifier: workspace:*
         version: link:../types
-      '@todo/ui':
-        specifier: workspace:*
-        version: link:../ui
       react:
         specifier: ^19
         version: 19.2.3
@@ -625,6 +622,18 @@ importers:
 
   packages/icons: {}
 
+  packages/styling:
+    dependencies:
+      '@todo/design-system':
+        specifier: workspace:*
+        version: link:../design-system
+      react:
+        specifier: ^19
+        version: 19.2.3
+      tamagui:
+        specifier: ^2.4.5
+        version: 2.4.5(react-dom@19.2.3(react@19.2.3))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
+
   packages/supabase:
     dependencies:
       '@supabase/supabase-js':
@@ -648,9 +657,6 @@ importers:
       '@todo/types':
         specifier: workspace:*
         version: link:../types
-      '@todo/ui':
-        specifier: workspace:*
-        version: link:../ui
 
   packages/types: {}
 
@@ -659,6 +665,9 @@ importers:
       '@todo/design-system':
         specifier: workspace:*
         version: link:../design-system
+      '@todo/styling':
+        specifier: workspace:*
+        version: link:../styling
       '@todo/types':
         specifier: workspace:*
         version: link:../types
@@ -668,9 +677,6 @@ importers:
       react-native-safe-area-context:
         specifier: ~5.7.0
         version: 5.7.0(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
-      tamagui:
-        specifier: ^2.4.5
-        version: 2.4.5(react-dom@19.2.3(react@19.2.3))(react-native@0.86.0(@babel/core@7.29.7)(@react-native/metro-config@0.86.0(@babel/core@7.29.7))(@types/react@19.2.17)(react@19.2.3))(react@19.2.3)
 
 packages:
 

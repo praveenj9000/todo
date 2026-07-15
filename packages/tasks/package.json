@@ -7,7 +7,6 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@todo/ui": "workspace:*",
     "@todo/types": "workspace:*",
     "@todo/supabase": "workspace:*"
   },

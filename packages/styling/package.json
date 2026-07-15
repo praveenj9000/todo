@@ -1,0 +1,17 @@
+{
+  "name": "@todo/styling",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@todo/design-system": "workspace:*",
+    "react": "^19",
+    "tamagui": "^2.4.5"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

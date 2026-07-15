@@ -1,0 +1,1 @@
+export { TamaguiProvider as StylingProvider } from "tamagui";

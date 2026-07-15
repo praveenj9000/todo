@@ -9,9 +9,9 @@
   "dependencies": {
     "@todo/design-system": "workspace:*",
     "@todo/types": "workspace:*",
+    "@todo/styling": "workspace:*",
     "react": "^19",
-    "react-native-safe-area-context": "~5.7.0",
-    "tamagui": "^2.4.5"
+    "react-native-safe-area-context": "~5.7.0"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
