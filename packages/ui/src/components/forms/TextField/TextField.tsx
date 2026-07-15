@@ -1,12 +1,34 @@
-import { Input, type InputProps } from "@todo/styling";
+import {
+  Column,
+  Input,
+} from "@todo/styling";
 
-export interface TextFieldProps extends InputProps {}
+import { FormError } from "../FormError";
+import { FormLabel } from "../FormLabel";
 
-export function TextField(props: TextFieldProps) {
+import type { TextFieldProps } from "./TextField.types";
+
+export function TextField({
+  label,
+  error,
+  ...props
+}: TextFieldProps) {
   return (
-    <Input
-      size="$4"
-      {...props}
-    />
+    <Column gap="$2">
+      {label && (
+        <FormLabel>
+          {label}
+        </FormLabel>
+      )}
+
+      <Input
+        size="$4"
+        {...props}
+      />
+
+      <FormError
+        message={error}
+      />
+    </Column>
   );
 }

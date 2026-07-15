@@ -1,6 +1,6 @@
 import type { InputProps } from "@todo/styling";
 
-export interface PasswordFieldProps extends InputProps {
+export interface TextFieldProps extends InputProps {
   label?: string;
 
   error?: string;
