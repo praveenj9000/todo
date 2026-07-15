@@ -1,13 +1,11 @@
-import {
-  Text as BaseText,
-  type TextProps,
-} from "@todo/styling";
+import { Input, type InputProps } from "@todo/styling";
 
-export function TextField(
-  props: TextProps
-) {
+export interface TextFieldProps extends InputProps {}
+
+export function TextField(props: TextFieldProps) {
   return (
-    <BaseText
+    <Input
+      size="$4"
       {...props}
     />
   );

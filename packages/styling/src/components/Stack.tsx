@@ -1,16 +1,12 @@
 import {
   XStack,
   YStack,
+  type XStackProps,
+  type YStackProps,
 } from "tamagui";
 
-type ColumnProps = React.ComponentProps<typeof YStack>;
-type RowProps = React.ComponentProps<typeof XStack>;
-
-export type StackProps = ColumnProps;
-
-export function Stack(props: StackProps) {
-  return <YStack {...props} />;
-}
+export type ColumnProps = YStackProps;
+export type RowProps = XStackProps;
 
 export function Column(props: ColumnProps) {
   return <YStack {...props} />;
