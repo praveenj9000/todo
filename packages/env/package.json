@@ -1,5 +1,5 @@
 {
-  "name": "@todo/auth",
+  "name": "@todo/env",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -8,8 +8,5 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.111.0"
   }
 }

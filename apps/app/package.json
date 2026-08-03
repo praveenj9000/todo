@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
     "@tamagui/config": "^2.6.2",
     "@tamagui/core": "^2.6.2",
     "@tamagui/font-inter": "^2.6.2",
@@ -19,7 +20,9 @@
     "react-native-safe-area-context": "~5.7.0",
     "react-native-screens": "~4.26.2",
     "react-native-web": "^0.21.2",
-    "tamagui": "^2.6.2"
+    "tamagui": "^2.6.2",
+    "@supabase/supabase-js": "^2.111.0",
+    "@todo/supabase": "workspace:*"
   },
   "devDependencies": {
     "@tamagui/babel-plugin": "^2.6.2",

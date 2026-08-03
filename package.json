@@ -4,15 +4,15 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.18.0",
-
   "scripts": {
-    "dev": "turbo dev",
-    "build": "turbo build",
+    "sync-env": "node scripts/sync-env.mjs",
+    "dev": "pnpm sync-env && turbo dev",
+    "build": "pnpm sync-env && turbo build",
     "typecheck": "turbo typecheck"
   },
-
   "devDependencies": {
     "@types/node": "^26.1.2",
+    "cpy-cli": "^7.0.0",
     "prettier": "^3.9.6",
     "turbo": "2.10.8",
     "typescript": "6.0.3"
