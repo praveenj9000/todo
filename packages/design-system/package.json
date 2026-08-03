@@ -1,0 +1,23 @@
+{
+  "name": "@todo/design-system",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tamagui/config": "^2.6.2",
+    "@tamagui/font-inter": "^2.6.2",
+    "@tamagui/themes": "^2.6.2",
+    "react": "19.2.3",
+    "tamagui": "^2.6.2"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  }
+}

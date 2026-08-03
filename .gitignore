@@ -1,0 +1,21 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+
+# Turbo
+.turbo/
+
+# Tamagui
+.tamagui/
+
+# Environment
+.env
+.env.*
+
+# OS
+.DS_Store
+Thumbs.db
