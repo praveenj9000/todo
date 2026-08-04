@@ -1,4 +1,4 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient, AuthChangeEvent, Session } from "@supabase/supabase-js";
 
 export async function signIn(
   supabase: SupabaseClient,
@@ -32,7 +32,10 @@ export function getSession(supabase: SupabaseClient) {
 
 export function onAuthStateChange(
   supabase: SupabaseClient,
-  callback: Parameters<SupabaseClient["auth"]["onAuthStateChange"]>[0]
+  callback: (
+    event: AuthChangeEvent,
+    session: Session | null
+  ) => void
 ) {
   return supabase.auth.onAuthStateChange(callback);
 }

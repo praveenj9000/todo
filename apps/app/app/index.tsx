@@ -1,6 +1,16 @@
 import { Redirect } from "expo-router";
+import { useAuth } from "../src/providers/AuthProvider";
 
 export default function Index() {
-  return null;
-  // return <Redirect href="/(app)" />;
+  const { loading, session } = useAuth();
+
+  if (loading) {
+    return null;
+  }
+
+  return (
+    <Redirect
+      href={session ? "/(app)" : "/(auth)/login"}
+    />
+  );
 }

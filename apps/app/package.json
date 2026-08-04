@@ -22,7 +22,8 @@
     "react-native-web": "^0.21.2",
     "tamagui": "^2.6.2",
     "@supabase/supabase-js": "^2.111.0",
-    "@todo/supabase": "workspace:*"
+    "@todo/supabase": "workspace:*",
+    "@todo/auth": "workspace:*"
   },
   "devDependencies": {
     "@tamagui/babel-plugin": "^2.6.2",

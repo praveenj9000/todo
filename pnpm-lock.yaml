@@ -243,6 +243,9 @@ importers:
       '@tamagui/themes':
         specifier: ^2.6.2
         version: 2.6.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@todo/auth':
+        specifier: workspace:*
+        version: link:../../packages/auth
       '@todo/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
