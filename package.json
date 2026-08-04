@@ -5,6 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@11.18.0",
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "sync-env": "node scripts/sync-env.mjs",
     "dev": "pnpm sync-env && turbo dev",
     "build": "pnpm sync-env && turbo build",
