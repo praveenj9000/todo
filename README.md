@@ -1,14 +1,8 @@
 # Todo
 
-A cross-platform Todo application built with **Expo**, **React Native**, **Expo Router**, **Tamagui**, **Supabase**, **Turbo**, and **pnpm workspaces**.
+A cross-platform Todo application built with **Expo**, **React Native**, **Expo Router**, **Tamagui**, **Supabase**, **Turbo**, and **pnpm Workspaces**.
 
-## Requirements
-
-* Node.js 24+
-* pnpm 11+
-* Git
-
-## Getting Started
+## Quick Start
 
 Clone the repository:
 
@@ -17,11 +11,11 @@ git clone <repository-url>
 cd todo
 ```
 
-Create a `.env` file in the project root (or copy `.env.example`) and add your Supabase credentials:
+Create a `.env` file in the project root:
 
 ```env
-EXPO_PUBLIC_SUPABASE_URL=your_project_url
-EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your_publishable_key
+EXPO_PUBLIC_SUPABASE_URL=<your-supabase-url>
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<your-supabase-publishable-key>
 ```
 
 Run the project setup:
@@ -36,54 +30,31 @@ Start the development server:
 pnpm dev
 ```
 
-## Available Scripts
+## Common Commands
 
-| Command          | Description                                                                                                 |
-| ---------------- | ----------------------------------------------------------------------------------------------------------- |
-| `pnpm setup`     | Installs dependencies, syncs environment files, checks the development environment, and runs type checking. |
-| `pnpm dev`       | Starts the Expo development server.                                                                         |
-| `pnpm build`     | Builds all workspace packages.                                                                              |
-| `pnpm typecheck` | Runs TypeScript type checking across the monorepo.                                                          |
-| `pnpm sync-env`  | Copies the root `.env` into the Expo app.                                                                   |
-
-### Supabase
-
-| Command              | Description                                                      |
-| -------------------- | ---------------------------------------------------------------- |
-| `pnpm db:login`      | Authenticate the Supabase CLI.                                   |
-| `pnpm db:link`       | Link this repository to a Supabase project.                      |
-| `pnpm db:new <name>` | Create a new database migration.                                 |
-| `pnpm db:push`       | Apply local migrations to the linked project.                    |
-| `pnpm db:pull`       | Pull schema changes from the linked project.                     |
-| `pnpm db:reset`      | Reset the local database (when using a local Supabase instance). |
-| `pnpm db:types`      | Generate TypeScript database types.                              |
+| Command          | Description                          |
+| ---------------- | ------------------------------------ |
+| `pnpm setup`     | Prepare the development environment. |
+| `pnpm dev`       | Start the Expo development server.   |
+| `pnpm build`     | Build all workspace packages.        |
+| `pnpm typecheck` | Run TypeScript type checking.        |
 
 ## Project Structure
 
 ```text
 apps/
-  app/                Expo application
-
 packages/
-  auth/
-  design-system/
-  env/
-  styling/
-  supabase/
-  types/
-  ui/
-
 scripts/
-  setup.mjs
-  sync-env.mjs
-
 supabase/
-  migrations/
+docs/
 ```
 
 ## Documentation
 
-Additional documentation will be added over time.
+* `docs/setup.md` — Complete project setup guide.
+* `docs/supabase.md` — Supabase workflow and database migrations.
+* `docs/architecture.md` — Project architecture (coming soon).
 
-* `architecture.md` — Application architecture and design decisions.
-* Database migrations are stored in `supabase/migrations`.
+## License
+
+This project is licensed under the MIT License.

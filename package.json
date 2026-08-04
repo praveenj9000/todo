@@ -9,7 +9,14 @@
     "sync-env": "node scripts/sync-env.mjs",
     "dev": "pnpm sync-env && turbo dev",
     "build": "pnpm sync-env && turbo build",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "db:login": "pnpm dlx supabase login",
+    "db:link": "pnpm dlx supabase link",
+    "db:push": "pnpm dlx supabase db push",
+    "db:pull": "pnpm dlx supabase db pull",
+    "db:reset": "pnpm dlx supabase db reset",
+    "db:types": "pnpm dlx supabase gen types typescript --linked > packages/types/src/database.ts",
+    "db:new": "pnpm dlx supabase migration new"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",
