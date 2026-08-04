@@ -1,20 +1,3 @@
-import { Button, YStack } from "tamagui";
-import { logout } from "../../src/services/auth";
+import SettingsScreen from "../../src/features/settings/screens/SettingsScreen";
 
-export default function SettingsScreen() {
-  async function handleLogout() {
-    await logout();
-  }
-
-  return (
-    <YStack
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Button onPress={handleLogout}>
-        Logout
-      </Button>
-    </YStack>
-  );
-}
+export default SettingsScreen;

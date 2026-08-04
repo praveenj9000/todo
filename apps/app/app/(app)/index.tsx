@@ -1,15 +1,3 @@
-import { Text, YStack } from "tamagui";
+import HomeScreen from "../../src/features/tasks/screen/HomeScreen";
 
-export default function HomeScreen() {
-  return (
-    <YStack
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Text fontSize={24}>
-        Todo 🚀
-      </Text>
-    </YStack>
-  );
-}
+export default HomeScreen;
