@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { DesignSystemProvider } from "@todo/design-system";
-import { AuthProvider } from "./AuthProvider";
+import { AuthProvider } from "@/features/auth";
 
 type Props = {
   children: ReactNode;

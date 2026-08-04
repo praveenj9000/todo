@@ -1,3 +1,3 @@
-import HomeScreen from "../../src/features/tasks/screen/HomeScreen";
+import { TaskListScreen } from "@/features/tasks";
 
-export default HomeScreen;
+export default TaskListScreen;

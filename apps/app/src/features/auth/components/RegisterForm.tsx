@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Input, Text, YStack } from "tamagui";
-import { register } from "../../../services/auth";
+import { register } from "../api/client";
 
 export function RegisterForm() {
   const [email, setEmail] = useState("");

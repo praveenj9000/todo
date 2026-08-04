@@ -1,5 +1,5 @@
 import { Button, YStack } from "tamagui";
-import { logout } from "../../../services/auth";
+import { logout } from "@/features/auth";
 
 export default function SettingsScreen() {
   async function handleLogout() {

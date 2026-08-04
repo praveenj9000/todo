@@ -1,6 +1,6 @@
 import { Text, YStack } from "tamagui";
 
-export default function HomeScreen() {
+export default function TaskListScreen() {
   return (
     <YStack
       flex={1}

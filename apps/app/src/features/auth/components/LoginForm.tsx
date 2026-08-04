@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button, Input, Text, YStack } from "tamagui";
-import { login } from "../../../services/auth";
+import { login } from "../api/client";
 
 export function LoginForm() {
   const [email, setEmail] = useState("");

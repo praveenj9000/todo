@@ -1,6 +1,6 @@
 import { Stack, Redirect, useSegments } from "expo-router";
-import { AppProvider } from "../src/providers/AppProvider";
-import { useAuth } from "../src/providers/AuthProvider";
+import { useAuth } from "@/features/auth";
+import { AppProvider } from "@/providers/AppProvider";
 
 function RootNavigator() {
   const { loading, session } = useAuth();
