@@ -128,3 +128,18 @@ export async function deleteTask(
     throw error;
   }
 }
+
+export async function reorderTasks(
+  taskIds: string[],
+): Promise<void> {
+  const { error } = await supabase.rpc(
+    "reorder_tasks",
+    {
+      task_ids: taskIds,
+    },
+  );
+
+  if (error) {
+    throw error;
+  }
+}

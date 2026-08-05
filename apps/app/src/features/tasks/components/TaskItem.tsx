@@ -11,10 +11,12 @@ import { useUpdateTask } from "../hooks/useUpdateTask";
 
 type Props = {
   task: Task;
+  drag: () => void;
 };
 
 export function TaskItem({
   task,
+  drag,
 }: Props) {
   const {
     mutateAsync: updateTask,
@@ -49,6 +51,7 @@ export function TaskItem({
       <Button
         size="$3"
         onPress={toggleCompleted}
+        onLongPress={drag}
       >
         {task.completed ? "✓" : "○"}
       </Button>

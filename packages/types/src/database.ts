@@ -77,7 +77,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      reorder_tasks: { Args: { task_ids: string[] }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
