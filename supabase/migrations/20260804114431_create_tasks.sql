@@ -7,6 +7,10 @@ create table public.tasks (
 
     title text not null,
 
+    constraint tasks_title_length check (
+        char_length(title) between 1 and 500
+    ),
+
     completed boolean not null default false,
 
     sort_order integer not null default 0,
@@ -26,6 +30,10 @@ create index tasks_user_id_sort_order_idx
 
 create index tasks_user_id_completed_idx
     on public.tasks(user_id, completed);
+
+create index tasks_active_idx
+on public.tasks(user_id, sort_order)
+where completed = false;
 
 alter table public.tasks enable row level security;
 
@@ -47,6 +55,9 @@ create policy "Users can update their own tasks"
 on public.tasks
 for update
 using (
+    auth.uid() = user_id
+)
+with check (
     auth.uid() = user_id
 );
 

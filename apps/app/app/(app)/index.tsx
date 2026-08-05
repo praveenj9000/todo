@@ -1,3 +1,5 @@
 import { TaskListScreen } from "@/features/tasks";
 
-export default TaskListScreen;
+export default function HomeRoute() {
+    return <TaskListScreen />;
+}
