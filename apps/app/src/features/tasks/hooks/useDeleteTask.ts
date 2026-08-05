@@ -4,7 +4,12 @@ import {
 } from "@tanstack/react-query";
 
 import { deleteTask } from "../api/tasks";
-import { TASKS_QUERY_KEY } from "../constants/query-keys";
+
+import {
+  optimisticUpdate,
+  refreshTasks,
+  rollbackTasks,
+} from "../utils/optimistic";
 
 export function useDeleteTask() {
   const queryClient = useQueryClient();
@@ -12,10 +17,25 @@ export function useDeleteTask() {
   return useMutation({
     mutationFn: deleteTask,
 
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: TASKS_QUERY_KEY,
-      });
+    async onMutate(id) {
+      return optimisticUpdate(
+        queryClient,
+        (tasks) =>
+          tasks.filter(
+            (task) => task.id !== id,
+          ),
+      );
+    },
+
+    onError(_error, _id, context) {
+      rollbackTasks(
+        queryClient,
+        context,
+      );
+    },
+
+    onSettled() {
+      refreshTasks(queryClient);
     },
   });
 }

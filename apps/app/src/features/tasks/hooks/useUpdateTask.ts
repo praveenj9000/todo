@@ -4,8 +4,14 @@ import {
 } from "@tanstack/react-query";
 
 import { updateTask } from "../api/tasks";
-import { TASKS_QUERY_KEY } from "../constants/query-keys";
+
 import type { UpdateTask } from "../types/task";
+
+import {
+  optimisticUpdate,
+  refreshTasks,
+  rollbackTasks,
+} from "../utils/optimistic";
 
 type UpdateTaskInput = {
   id: string;
@@ -22,10 +28,33 @@ export function useUpdateTask() {
     }: UpdateTaskInput) =>
       updateTask(id, updates),
 
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: TASKS_QUERY_KEY,
-      });
+    async onMutate({
+      id,
+      updates,
+    }) {
+      return optimisticUpdate(
+        queryClient,
+        (tasks) =>
+          tasks.map((task) =>
+            task.id === id
+              ? {
+                  ...task,
+                  ...updates,
+                }
+              : task,
+          ),
+      );
+    },
+
+    onError(_error, _input, context) {
+      rollbackTasks(
+        queryClient,
+        context,
+      );
+    },
+
+    onSettled() {
+      refreshTasks(queryClient);
     },
   });
 }
