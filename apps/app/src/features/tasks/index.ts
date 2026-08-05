@@ -1,1 +1,1 @@
-export { default as TaskListScreen } from "./screens/TaskListScreen";
+export { TaskListScreen } from "./screens/TaskListScreen";

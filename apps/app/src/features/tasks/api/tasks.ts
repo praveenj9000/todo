@@ -1,23 +1,58 @@
 import { supabase } from "@/lib/supabase";
+
 import type {
-  CreateTaskInput,
-  UpdateTaskInput,
+  GetTasksInput,
+  NewTask,
+  Task,
+  UpdateTask,
 } from "../types/task";
 
+export async function getTasks({
+  filter,
+  sort,
+}: GetTasksInput): Promise<Task[]> {
+  let query = supabase
+    .from("tasks")
+    .select("*");
 
-export async function getTasks() {
+  switch (filter) {
+    case "active":
+      query = query.eq("completed", false);
+      break;
+
+    case "completed":
+      query = query.eq("completed", true);
+      break;
+  }
+
+  switch (sort) {
+    case "manual":
+      query = query
+        .order("sort_order", {
+          ascending: true,
+        })
+        .order("created_at", {
+          ascending: false,
+        });
+      break;
+
+    case "created":
+      query = query.order("created_at", {
+        ascending: false,
+      });
+      break;
+
+    case "updated":
+      query = query.order("updated_at", {
+        ascending: false,
+      });
+      break;
+  }
+
   const {
     data,
     error,
-  } = await supabase
-    .from("tasks")
-    .select("*")
-    .order("sort_order", {
-      ascending: true,
-    })
-    .order("created_at", {
-      ascending: false,
-    });
+  } = await query;
 
   if (error) {
     throw error;
@@ -26,21 +61,18 @@ export async function getTasks() {
   return data;
 }
 
-
 export async function createTask(
-  input: Pick<CreateTaskInput, "title">
-) {
+  input: Pick<NewTask, "title">,
+): Promise<Task> {
   const {
     data: {
       user,
     },
   } = await supabase.auth.getUser();
 
-
   if (!user) {
     throw new Error("User not authenticated");
   }
-
 
   const {
     data,
@@ -54,20 +86,17 @@ export async function createTask(
     .select()
     .single();
 
-
   if (error) {
     throw error;
   }
 
-
   return data;
 }
 
-
 export async function updateTask(
   id: string,
-  updates: UpdateTaskInput
-) {
+  updates: UpdateTask,
+): Promise<Task> {
   const {
     data,
     error,
@@ -78,26 +107,22 @@ export async function updateTask(
     .select()
     .single();
 
-
   if (error) {
     throw error;
   }
 
-
   return data;
 }
 
-
 export async function deleteTask(
-  id: string
-) {
+  id: string,
+): Promise<void> {
   const {
     error,
   } = await supabase
     .from("tasks")
     .delete()
     .eq("id", id);
-
 
   if (error) {
     throw error;

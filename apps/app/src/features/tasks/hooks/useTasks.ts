@@ -1,77 +1,25 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
-
-import {
-  getTasks,
-  createTask,
-  updateTask,
-  deleteTask,
-} from "../api/tasks";
-
-
-const TASKS_KEY = ["tasks"];
-
+import { useQuery } from "@tanstack/react-query";
+import { getTasks } from "../api/tasks";
+import { TASKS_QUERY_KEY } from "../constants/query-keys";
+import { useTasksStore } from "../stores/tasks-ui.store";
 
 export function useTasks() {
-  const queryClient = useQueryClient();
+  const {
+    filter,
+    sort,
+  } = useTasksStore();
 
+  return useQuery({
+    queryKey: [
+      ...TASKS_QUERY_KEY,
+      filter,
+      sort,
+    ],
 
-  const query = useQuery({
-    queryKey: TASKS_KEY,
-    queryFn: getTasks,
+    queryFn: () =>
+      getTasks({
+        filter,
+        sort,
+      }),
   });
-
-
-  const createMutation = useMutation({
-    mutationFn: createTask,
-
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: TASKS_KEY,
-      });
-    },
-  });
-
-
-  const updateMutation = useMutation({
-    mutationFn: ({
-      id,
-      updates,
-    }: {
-      id: string;
-      updates: Parameters<typeof updateTask>[1];
-    }) =>
-      updateTask(id, updates),
-
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: TASKS_KEY,
-      });
-    },
-  });
-
-
-  const deleteMutation = useMutation({
-    mutationFn: deleteTask,
-
-    onSuccess() {
-      queryClient.invalidateQueries({
-        queryKey: TASKS_KEY,
-      });
-    },
-  });
-
-
-    return {
-        ...query,
-        createTask: createMutation.mutateAsync,
-        updateTask: updateMutation.mutateAsync,
-        deleteTask: deleteMutation.mutateAsync,
-        creating: createMutation.isPending,
-        updating: updateMutation.isPending,
-        deleting: deleteMutation.isPending,
-    };
 }

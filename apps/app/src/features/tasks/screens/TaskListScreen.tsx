@@ -1,15 +1,14 @@
-import { Text, YStack } from "tamagui";
+import { YStack } from "tamagui";
+import { AddTaskForm } from "../components/AddTaskForm";
+import { TaskFilters } from "../components/TaskFilters";
+import { TaskList } from "../components/TaskList";
 
-export default function TaskListScreen() {
+export function TaskListScreen() {
   return (
-    <YStack
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Text fontSize={24}>
-        Todo 🚀
-      </Text>
+    <YStack flex={1}>
+      <AddTaskForm />
+      <TaskFilters />
+      <TaskList />
     </YStack>
   );
 }

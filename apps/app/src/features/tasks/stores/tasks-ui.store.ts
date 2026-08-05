@@ -1,16 +1,28 @@
 import { create } from "zustand";
 
-export type TaskView =
-  | "all"
-  | "active"
-  | "completed";
+import {
+  TASK_FILTERS,
+  TASK_SORTS,
+} from "../constants/tasks";
 
-type TasksUIStore = {
-  view: TaskView;
-  setView(view: TaskView): void;
+export type TaskFilter =
+  (typeof TASK_FILTERS)[keyof typeof TASK_FILTERS];
+
+export type TaskSort =
+  (typeof TASK_SORTS)[keyof typeof TASK_SORTS];
+
+type TasksStore = {
+  filter: TaskFilter;
+  sort: TaskSort;
+
+  setFilter(filter: TaskFilter): void;
+  setSort(sort: TaskSort): void;
 };
 
-export const useTasksUIStore = create<TasksUIStore>((set) => ({
-  view: "all",
-  setView: (view) => set({ view }),
-}));
+export const useTasksStore =
+  create<TasksStore>((set) => ({
+    filter: TASK_FILTERS.ALL,
+    sort: TASK_SORTS.MANUAL,
+    setFilter: (filter) => set({ filter }),
+    setSort: (sort) => set({ sort }),
+  }));
