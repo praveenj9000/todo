@@ -1,23 +1,36 @@
 import {
-  Button,
-  Text,
-  XStack,
-} from "tamagui";
+  CSS,
+} from "@dnd-kit/utilities";
+
+import {
+  useSortable,
+} from "@dnd-kit/sortable";
 
 import type { Task } from "../types/task";
 
 import { useDeleteTask } from "../hooks/useDeleteTask";
 import { useUpdateTask } from "../hooks/useUpdateTask";
 
+import { TaskRow } from "./TaskRow";
+
 type Props = {
   task: Task;
-  drag: () => void;
 };
 
 export function TaskItem({
   task,
-  drag,
 }: Props) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: task.id,
+  });
+
   const {
     mutateAsync: updateTask,
   } = useUpdateTask();
@@ -43,30 +56,23 @@ export function TaskItem({
   }
 
   return (
-    <XStack
-      padding="$4"
-      gap="$2"
-      alignItems="center"
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(
+          transform,
+        ),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+      }}
+      {...attributes}
+      {...listeners}
     >
-      <Button
-        size="$3"
-        onPress={toggleCompleted}
-        onLongPress={drag}
-      >
-        {task.completed ? "✓" : "○"}
-      </Button>
-
-      <Text flex={1}>
-        {task.title}
-      </Text>
-
-      <Button
-        size="$3"
-        theme="red"
-        onPress={removeTask}
-      >
-        Delete
-      </Button>
-    </XStack>
+      <TaskRow
+        task={task}
+        onToggleCompleted={toggleCompleted}
+        onDelete={removeTask}
+      />
+    </div>
   );
 }

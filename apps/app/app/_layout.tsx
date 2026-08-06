@@ -1,4 +1,8 @@
-import { Stack, Redirect, useSegments } from "expo-router";
+import "react-native-reanimated";
+
+import { Redirect, Stack, useSegments } from "expo-router";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import { useAuth } from "@/features/auth";
 import { AppProvider } from "@/providers/AppProvider";
 
@@ -31,8 +35,12 @@ function RootNavigator() {
 
 export default function RootLayout() {
   return (
-    <AppProvider>
-      <RootNavigator />
-    </AppProvider>
+    <GestureHandlerRootView
+      style={{ flex: 1 }}
+    >
+      <AppProvider>
+        <RootNavigator />
+      </AppProvider>
+    </GestureHandlerRootView>
   );
 }

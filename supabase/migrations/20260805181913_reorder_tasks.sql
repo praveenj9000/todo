@@ -14,9 +14,9 @@ begin
 
     if exists (
         select 1
-        from unnest(task_ids) as id
+        from unnest(task_ids) as incoming(task_id)
         left join public.tasks t
-            on t.id = id
+            on t.id = incoming.task_id
         where t.user_id is distinct from current_user_id
     ) then
         raise exception 'Invalid task list';
@@ -26,11 +26,10 @@ begin
     set sort_order = reordered.sort_order
     from (
         select
-            id,
-            row_number() over () - 1 as sort_order
-        from unnest(task_ids) with ordinality as ordered(id, position)
-        order by position
+            task_id,
+            row_number() over (order by position) - 1 as sort_order
+        from unnest(task_ids) with ordinality as incoming(task_id, position)
     ) as reordered
-    where tasks.id = reordered.id;
+    where public.tasks.id = reordered.task_id;
 end;
 $$;
