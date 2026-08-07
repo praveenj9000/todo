@@ -1,18 +1,15 @@
-import DraggableFlatList, {
-  ScaleDecorator,
-  type RenderItemParams,
-} from "react-native-draggable-flatlist";
-
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { Loading } from "@/components/Loading";
+import { SortableList } from "@todo/ui/sortable";
+import { Spinner } from "tamagui";
 
-import { useReorderTasks } from "../hooks/useReorderTasks";
+import { TaskItem } from "./TaskItem";
+
+import { useMoveTask } from "../hooks/useMoveTask";
 import { useTasks } from "../hooks/useTasks";
 
 import type { Task } from "../types/task";
-
-import { TaskItem } from "./TaskItem.native";
 
 export function TaskList() {
   const {
@@ -20,11 +17,17 @@ export function TaskList() {
     isPending,
     isError,
     refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useTasks();
 
   const {
-    mutate: reorderTasks,
-  } = useReorderTasks();
+    mutate: moveTask,
+  } = useMoveTask();
+
+  const tasks: Task[] =
+    data?.pages.flatMap((page) => page.tasks) ?? [];
 
   if (isPending) {
     return <Loading />;
@@ -40,7 +43,7 @@ export function TaskList() {
     );
   }
 
-  if (!data?.length) {
+  if (tasks.length === 0) {
     return (
       <EmptyState
         title="No tasks yet"
@@ -50,24 +53,36 @@ export function TaskList() {
   }
 
   return (
-    <DraggableFlatList
-      data={data}
-      keyExtractor={(item) => item.id}
-      activationDistance={8}
-      renderItem={({
-        item,
-        drag,
-      }: RenderItemParams<Task>) => (
-        <ScaleDecorator>
+    <>
+      <SortableList<Task>
+        data={tasks}
+        keyExtractor={(task) => task.id}
+        activationDistance={8}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        onEndReachedThreshold={0.5}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onReorder={(result, items) => {
+          moveTask({
+            taskId: result.itemId,
+            prevId: result.prevId,
+            nextId: result.nextId,
+            items,
+          });
+        }}
+        renderItem={(task) => (
           <TaskItem
-            task={item}
-            drag={drag}
+            key={task.id}
+            task={task}
           />
-        </ScaleDecorator>
-      )}
-      onDragEnd={({ data }) => {
-        reorderTasks(data.map((task) => task.id));
-      }}
-    />
+        )}
+      />
+
+      {isFetchingNextPage ? <Spinner /> : null}
+    </>
   );
 }

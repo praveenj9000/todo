@@ -1,16 +1,7 @@
-import {
-  CSS,
-} from "@dnd-kit/utilities";
-
-import {
-  useSortable,
-} from "@dnd-kit/sortable";
-
 import type { Task } from "../types/task";
-
 import { useDeleteTask } from "../hooks/useDeleteTask";
 import { useUpdateTask } from "../hooks/useUpdateTask";
-
+import { SortableHandle, SortableItem } from "@todo/ui/sortable";
 import { TaskRow } from "./TaskRow";
 
 type Props = {
@@ -20,17 +11,6 @@ type Props = {
 export function TaskItem({
   task,
 }: Props) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: task.id,
-  });
-
   const {
     mutateAsync: updateTask,
   } = useUpdateTask();
@@ -56,23 +36,13 @@ export function TaskItem({
   }
 
   return (
-    <div
-      ref={setNodeRef}
-      style={{
-        transform: CSS.Transform.toString(
-          transform,
-        ),
-        transition,
-        opacity: isDragging ? 0.5 : 1,
-      }}
-      {...attributes}
-      {...listeners}
-    >
+    <SortableItem id={task.id}>
       <TaskRow
         task={task}
         onToggleCompleted={toggleCompleted}
         onDelete={removeTask}
+        DragHandle={SortableHandle}
       />
-    </div>
+    </SortableItem>
   );
 }

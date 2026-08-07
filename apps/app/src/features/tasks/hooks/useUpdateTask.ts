@@ -4,6 +4,8 @@ import {
 } from "@tanstack/react-query";
 
 import { updateTask } from "../api/tasks";
+import { TASKS_QUERY_KEY } from "../constants/query-keys";
+import { useTasksStore } from "../stores/tasks-ui.store";
 
 import type { UpdateTask } from "../types/task";
 
@@ -21,6 +23,17 @@ type UpdateTaskInput = {
 export function useUpdateTask() {
   const queryClient = useQueryClient();
 
+  const {
+    filter,
+    sort,
+  } = useTasksStore();
+
+  const queryKey = [
+    ...TASKS_QUERY_KEY,
+    filter,
+    sort,
+  ];
+
   return useMutation({
     mutationFn: ({
       id,
@@ -34,6 +47,7 @@ export function useUpdateTask() {
     }) {
       return optimisticUpdate(
         queryClient,
+        queryKey,
         (tasks) =>
           tasks.map((task) =>
             task.id === id
@@ -49,6 +63,7 @@ export function useUpdateTask() {
     onError(_error, _input, context) {
       rollbackTasks(
         queryClient,
+        queryKey,
         context,
       );
     },

@@ -1,9 +1,10 @@
-import type { QueryClient } from "@tanstack/react-query";
+import type { QueryClient, QueryKey } from "@tanstack/react-query";
 
 import type { Task } from "../types/task";
 
 import {
   cancelTasksQuery,
+  flattenTasksCache,
   getTasksCache,
   invalidateTasks,
   setTasksCache,
@@ -15,15 +16,18 @@ export type TasksContext = {
 
 export async function optimisticUpdate(
   queryClient: QueryClient,
+  queryKey: QueryKey,
   updater: (tasks: Task[]) => Task[],
 ): Promise<TasksContext> {
   await cancelTasksQuery(queryClient);
 
-  const previousTasks =
-    getTasksCache(queryClient) ?? [];
+  const previousTasks = flattenTasksCache(
+    getTasksCache(queryClient, queryKey),
+  );
 
   setTasksCache(
     queryClient,
+    queryKey,
     updater(previousTasks),
   );
 
@@ -34,6 +38,7 @@ export async function optimisticUpdate(
 
 export function rollbackTasks(
   queryClient: QueryClient,
+  queryKey: QueryKey,
   context?: TasksContext,
 ) {
   if (!context) {
@@ -42,6 +47,7 @@ export function rollbackTasks(
 
   setTasksCache(
     queryClient,
+    queryKey,
     context.previousTasks,
   );
 }

@@ -1,48 +1,30 @@
-import {
-  DndContext,
-  PointerSensor,
-  KeyboardSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  sortableKeyboardCoordinates,
-  arrayMove,
-} from "@dnd-kit/sortable";
-
 import { EmptyState } from "@/components/EmptyState";
 import { ErrorState } from "@/components/ErrorState";
 import { Loading } from "@/components/Loading";
-
+import { SortableList } from "@todo/ui/sortable";
+import { Spinner } from "tamagui";
+import { TaskItem } from "./TaskItem";
+import { useMoveTask } from "../hooks/useMoveTask";
 import { useTasks } from "../hooks/useTasks";
-import { useReorderTasks } from "../hooks/useReorderTasks";
-
-import { TaskItem } from "./TaskItem.web";
+import type { Task } from "../types/task";
 
 export function TaskList() {
   const {
-    data = [],
+    data,
     isPending,
     isError,
     refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useTasks();
 
   const {
-    mutate: reorderTasks,
-  } = useReorderTasks();
+    mutate: moveTask,
+  } = useMoveTask();
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter:
-        sortableKeyboardCoordinates,
-    }),
-  );
+  const tasks: Task[] =
+    data?.pages.flatMap((page) => page.tasks) ?? [];
 
   if (isPending) {
     return <Loading />;
@@ -58,7 +40,7 @@ export function TaskList() {
     );
   }
 
-  if (!data.length) {
+  if (!tasks.length) {
     return (
       <EmptyState
         title="No tasks yet"
@@ -67,56 +49,35 @@ export function TaskList() {
     );
   }
 
-  function handleDragEnd({
-    active,
-    over,
-  }: DragEndEvent) {
-    if (!over) {
-      return;
-    }
-
-    if (active.id === over.id) {
-      return;
-    }
-
-    const oldIndex = data.findIndex(
-      (task) => task.id === active.id,
-    );
-
-    const newIndex = data.findIndex(
-      (task) => task.id === over.id,
-    );
-
-    const reordered = arrayMove(
-      data,
-      oldIndex,
-      newIndex,
-    );
-
-    reorderTasks(
-      reordered.map((task) => task.id),
-    );
-  }
-
   return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCenter}
-      onDragEnd={handleDragEnd}
-    >
-      <SortableContext
-        items={data.map((task) => task.id)}
-        strategy={
-          verticalListSortingStrategy
-        }
-      >
-        {data.map((task) => (
+    <>
+      <SortableList<Task>
+        data={tasks}
+        keyExtractor={(task) => task.id}
+        onEndReached={() => {
+          if (hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
+          }
+        }}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        onReorder={(result, items) => {
+          moveTask({
+            taskId: result.itemId,
+            prevId: result.prevId,
+            nextId: result.nextId,
+            items,
+          });
+        }}
+        renderItem={(task) => (
           <TaskItem
             key={task.id}
             task={task}
           />
-        ))}
-      </SortableContext>
-    </DndContext>
+        )}
+      />
+
+      {isFetchingNextPage ? <Spinner /> : null}
+    </>
   );
 }

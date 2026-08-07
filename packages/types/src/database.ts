@@ -77,7 +77,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      reorder_tasks: { Args: { task_ids: string[] }; Returns: undefined }
+      move_task: {
+        Args: { p_next_id?: string; p_prev_id?: string; p_task_id: string }
+        Returns: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "tasks"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never

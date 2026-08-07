@@ -4,6 +4,8 @@ import {
 } from "@tanstack/react-query";
 
 import { createTask } from "../api/tasks";
+import { TASKS_QUERY_KEY } from "../constants/query-keys";
+import { useTasksStore } from "../stores/tasks-ui.store";
 
 import type { Task } from "../types/task";
 
@@ -16,12 +18,24 @@ import {
 export function useCreateTask() {
   const queryClient = useQueryClient();
 
+  const {
+    filter,
+    sort,
+  } = useTasksStore();
+
+  const queryKey = [
+    ...TASKS_QUERY_KEY,
+    filter,
+    sort,
+  ];
+
   return useMutation({
     mutationFn: createTask,
 
     async onMutate(input) {
       return optimisticUpdate(
         queryClient,
+        queryKey,
         (tasks) => {
           const optimisticTask: Task = {
             id: crypto.randomUUID(),
@@ -45,6 +59,7 @@ export function useCreateTask() {
     onError(_error, _input, context) {
       rollbackTasks(
         queryClient,
+        queryKey,
         context,
       );
     },

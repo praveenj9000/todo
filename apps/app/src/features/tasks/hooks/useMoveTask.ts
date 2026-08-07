@@ -3,17 +3,23 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
-import { deleteTask } from "../api/tasks";
+import { moveTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
 import { useTasksStore } from "../stores/tasks-ui.store";
+import type { MoveTaskInput, Task } from "../types/task";
 
 import {
   optimisticUpdate,
-  refreshTasks,
   rollbackTasks,
 } from "../utils/optimistic";
 
-export function useDeleteTask() {
+import { resetTasksToFirstPage } from "../utils/query";
+
+type MoveTaskVariables = MoveTaskInput & {
+  items: Task[];
+};
+
+export function useMoveTask() {
   const queryClient = useQueryClient();
 
   const {
@@ -28,20 +34,26 @@ export function useDeleteTask() {
   ];
 
   return useMutation({
-    mutationFn: deleteTask,
+    mutationFn: ({
+      taskId,
+      prevId,
+      nextId,
+    }: MoveTaskVariables) =>
+      moveTask({
+        taskId,
+        prevId,
+        nextId,
+      }),
 
-    async onMutate(id) {
+    async onMutate({ items }) {
       return optimisticUpdate(
         queryClient,
         queryKey,
-        (tasks) =>
-          tasks.filter(
-            (task) => task.id !== id,
-          ),
+        () => items,
       );
     },
 
-    onError(_error, _id, context) {
+    onError(_error, _vars, context) {
       rollbackTasks(
         queryClient,
         queryKey,
@@ -50,7 +62,7 @@ export function useDeleteTask() {
     },
 
     onSettled() {
-      refreshTasks(queryClient);
+      resetTasksToFirstPage(queryClient, queryKey);
     },
   });
 }

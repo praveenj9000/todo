@@ -1,16 +1,37 @@
 import { supabase } from "@/lib/supabase";
 
+import { TASKS_PAGE_SIZE } from "../constants/tasks";
+
 import type {
-  GetTasksInput,
+  GetTasksPageInput,
+  MoveTaskInput,
   NewTask,
   Task,
+  TasksPage,
   UpdateTask,
 } from "../types/task";
 
-export async function getTasks({
+const SORT_COLUMN = {
+  manual: "sort_order",
+  created: "created_at",
+  updated: "updated_at",
+} as const;
+
+const SORT_ASCENDING = {
+  manual: true,
+  created: false,
+  updated: false,
+} as const;
+
+export async function getTasksPage({
   filter,
   sort,
-}: GetTasksInput): Promise<Task[]> {
+  cursor,
+  limit = TASKS_PAGE_SIZE,
+}: GetTasksPageInput): Promise<TasksPage> {
+  const column = SORT_COLUMN[sort];
+  const ascending = SORT_ASCENDING[sort];
+
   let query = supabase
     .from("tasks")
     .select("*");
@@ -25,28 +46,17 @@ export async function getTasks({
       break;
   }
 
-  switch (sort) {
-    case "manual":
-      query = query
-        .order("sort_order", {
-          ascending: true,
-        })
-        .order("created_at", {
-          ascending: false,
-        });
-      break;
+  query = query
+    .order(column, { ascending })
+    .order("id", { ascending: true })
+    .limit(limit);
 
-    case "created":
-      query = query.order("created_at", {
-        ascending: false,
-      });
-      break;
+  if (cursor) {
+    const op = ascending ? "lt" : "gt";
 
-    case "updated":
-      query = query.order("updated_at", {
-        ascending: false,
-      });
-      break;
+    query = query.or(
+      `${column}.${op}.${cursor.primary},and(${column}.eq.${cursor.primary},id.gt.${cursor.id})`,
+    );
   }
 
   const {
@@ -58,7 +68,21 @@ export async function getTasks({
     throw error;
   }
 
-  return data;
+  const tasks = data ?? [];
+  const last = tasks[tasks.length - 1];
+
+  const nextCursor =
+    tasks.length === limit && last
+      ? {
+          primary: last[column] as string | number,
+          id: last.id,
+        }
+      : null;
+
+  return {
+    tasks,
+    nextCursor,
+  };
 }
 
 export async function createTask(
@@ -129,17 +153,23 @@ export async function deleteTask(
   }
 }
 
-export async function reorderTasks(
-  taskIds: string[],
-): Promise<void> {
-  const { error } = await supabase.rpc(
-    "reorder_tasks",
-    {
-      task_ids: taskIds,
-    },
-  );
+export async function moveTask({
+  taskId,
+  prevId,
+  nextId,
+}: MoveTaskInput): Promise<Task> {
+  const {
+    data,
+    error,
+  } = await supabase.rpc("move_task", {
+    p_task_id: taskId,
+    p_prev_id: prevId ?? undefined,
+    p_next_id: nextId ?? undefined,
+  });
 
   if (error) {
     throw error;
   }
+
+  return data;
 }

@@ -1,3 +1,8 @@
+import type {
+  ComponentType,
+  PropsWithChildren,
+} from "react";
+
 import {
   Button,
   Text,
@@ -6,18 +11,21 @@ import {
 
 import type { Task } from "../types/task";
 
+type DragHandleComponent =
+  ComponentType<PropsWithChildren>;
+
 type Props = {
   task: Task;
   onToggleCompleted: () => void;
   onDelete: () => void;
-  onDragStart?: () => void;
+  DragHandle: DragHandleComponent;
 };
 
 export function TaskRow({
   task,
   onToggleCompleted,
   onDelete,
-  onDragStart,
+  DragHandle,
 }: Props) {
   return (
     <XStack
@@ -25,13 +33,14 @@ export function TaskRow({
       gap="$3"
       alignItems="center"
     >
-      <Button
-        chromeless
-        size="$3"
-        onLongPress={onDragStart}
-      >
-        ☰
-      </Button>
+      <DragHandle>
+        <Button
+          chromeless
+          size="$3"
+        >
+          ☰
+        </Button>
+      </DragHandle>
 
       <Button
         size="$3"

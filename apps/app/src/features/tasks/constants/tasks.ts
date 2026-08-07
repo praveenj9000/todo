@@ -13,3 +13,5 @@ export const TASK_SORTS = {
 } as const;
 
 export type TaskSort = (typeof TASK_SORTS)[keyof typeof TASK_SORTS];
+
+export const TASKS_PAGE_SIZE = 20;
