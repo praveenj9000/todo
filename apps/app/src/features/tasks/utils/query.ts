@@ -125,3 +125,19 @@ export function resetTasksToFirstPage(
     refetchType: "active",
   });
 }
+
+export function setPagedTasksCache(
+  queryClient: QueryClient,
+  queryKey: QueryKey,
+  tasks: Task[],
+) {
+  queryClient.setQueryData<{ tasks: Task[]; totalCount: number }>(
+    queryKey,
+    (previous) =>
+      previous
+        ? { ...previous, tasks }
+        : { tasks, totalCount: tasks.length },
+  );
+
+  return undefined;
+}

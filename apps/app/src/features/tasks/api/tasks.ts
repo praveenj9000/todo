@@ -4,9 +4,11 @@ import { TASKS_PAGE_SIZE } from "../constants/tasks";
 
 import type {
   GetTasksPageInput,
+  GetTasksPageOffsetInput,
   MoveTaskInput,
   NewTask,
   Task,
+  TasksOffsetPage,
   TasksPage,
   UpdateTask,
 } from "../types/task";
@@ -82,6 +84,53 @@ export async function getTasksPage({
   return {
     tasks,
     nextCursor,
+  };
+}
+
+export async function getTasksPageOffset({
+  filter,
+  sort,
+  page,
+  pageSize,
+}: GetTasksPageOffsetInput): Promise<TasksOffsetPage> {
+  const column = SORT_COLUMN[sort];
+  const ascending = SORT_ASCENDING[sort];
+
+  let query = supabase
+    .from("tasks")
+    .select("*", { count: "exact" });
+
+  switch (filter) {
+    case "active":
+      query = query.eq("completed", false);
+      break;
+
+    case "completed":
+      query = query.eq("completed", true);
+      break;
+  }
+
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  query = query
+    .order(column, { ascending })
+    .order("id", { ascending: true })
+    .range(from, to);
+
+  const {
+    data,
+    error,
+    count,
+  } = await query;
+
+  if (error) {
+    throw error;
+  }
+
+  return {
+    tasks: data ?? [],
+    totalCount: count ?? 0,
   };
 }
 

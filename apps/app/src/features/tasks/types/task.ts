@@ -35,3 +35,15 @@ export type MoveTaskInput = {
   prevId: string | null;
   nextId: string | null;
 };
+
+export type GetTasksPageOffsetInput = {
+  filter: TaskFilter;
+  sort: TaskSort;
+  page: number;
+  pageSize: number;
+};
+
+export type TasksOffsetPage = {
+  tasks: Task[];
+  totalCount: number;
+};

@@ -1,7 +1,10 @@
+// apps/app/src/features/tasks/hooks/useMoveTask.ts
 import {
   useMutation,
   useQueryClient,
 } from "@tanstack/react-query";
+
+import { FEATURES } from "@/config/features";
 
 import { moveTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
@@ -13,11 +16,17 @@ import {
   rollbackTasks,
 } from "../utils/optimistic";
 
-import { resetTasksToFirstPage } from "../utils/query";
+import {
+  invalidateTasks,
+  resetTasksToFirstPage,
+  setPagedTasksCache,
+} from "../utils/query";
 
 type MoveTaskVariables = MoveTaskInput & {
   items: Task[];
 };
+
+const IS_PAGED = FEATURES.pagination.enabled && !FEATURES.infiniteScroll.enabled;
 
 export function useMoveTask() {
   const queryClient = useQueryClient();
@@ -25,13 +34,12 @@ export function useMoveTask() {
   const {
     filter,
     sort,
+    page,
+    pageSize,
   } = useTasksStore();
 
-  const queryKey = [
-    ...TASKS_QUERY_KEY,
-    filter,
-    sort,
-  ];
+  const scrollQueryKey = [...TASKS_QUERY_KEY, filter, sort];
+  const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", filter, sort, page, pageSize];
 
   return useMutation({
     mutationFn: ({
@@ -46,23 +54,32 @@ export function useMoveTask() {
       }),
 
     async onMutate({ items }) {
+      if (IS_PAGED) {
+        return setPagedTasksCache(queryClient, pagedQueryKey, items);
+      }
+
       return optimisticUpdate(
         queryClient,
-        queryKey,
+        scrollQueryKey,
         () => items,
       );
     },
 
     onError(_error, _vars, context) {
+      if (IS_PAGED) {
+        return;
+      }
+
       rollbackTasks(
         queryClient,
-        queryKey,
+        scrollQueryKey,
         context,
       );
     },
 
     onSettled() {
-      resetTasksToFirstPage(queryClient, queryKey);
+      resetTasksToFirstPage(queryClient, scrollQueryKey);
+      invalidateTasks(queryClient);
     },
   });
 }

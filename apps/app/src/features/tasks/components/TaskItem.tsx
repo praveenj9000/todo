@@ -6,10 +6,12 @@ import { TaskRow } from "./TaskRow";
 
 type Props = {
   task: Task;
+  draggable?: boolean;
 };
 
 export function TaskItem({
   task,
+  draggable = false,
 }: Props) {
   const {
     mutateAsync: updateTask,
@@ -35,14 +37,18 @@ export function TaskItem({
     await deleteTask(task.id);
   }
 
-  return (
-    <SortableItem id={task.id}>
-      <TaskRow
-        task={task}
-        onToggleCompleted={toggleCompleted}
-        onDelete={removeTask}
-        DragHandle={SortableHandle}
-      />
-    </SortableItem>
+  const row = (
+    <TaskRow
+      task={task}
+      onToggleCompleted={toggleCompleted}
+      onDelete={removeTask}
+      DragHandle={draggable ? SortableHandle : undefined}
+    />
+  );
+
+  return draggable ? (
+    <SortableItem id={task.id}>{row}</SortableItem>
+  ) : (
+    row
   );
 }

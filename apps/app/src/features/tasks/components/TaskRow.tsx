@@ -18,7 +18,7 @@ type Props = {
   task: Task;
   onToggleCompleted: () => void;
   onDelete: () => void;
-  DragHandle: DragHandleComponent;
+  DragHandle?: DragHandleComponent;
 };
 
 export function TaskRow({
@@ -33,14 +33,16 @@ export function TaskRow({
       gap="$3"
       alignItems="center"
     >
-      <DragHandle>
-        <Button
-          chromeless
-          size="$3"
-        >
-          ☰
-        </Button>
-      </DragHandle>
+      {DragHandle ? (
+        <DragHandle>
+          <Button
+            chromeless
+            size="$3"
+          >
+            ☰
+          </Button>
+        </DragHandle>
+      ) : null}
 
       <Button
         size="$3"
