@@ -1,6 +1,4 @@
-import { EmptyState } from "@/components/EmptyState";
-import { ErrorState } from "@/components/ErrorState";
-import { Loading } from "@/components/Loading";
+import { EmptyState, ErrorState, Loading } from "@todo/design-system";
 import { FEATURES } from "@/config/features";
 import { AsyncList } from "@todo/ui/list";
 

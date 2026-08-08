@@ -1,71 +1,36 @@
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useOptimisticListMutation } from "@todo/query-toolkit";
 
 import { createTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
 import { useTasksStore } from "../stores/tasks-ui.store";
+import type { NewTask, Task, TasksCursor, TasksPage } from "../types/task";
 
-import type { Task } from "../types/task";
-
-import {
-  optimisticUpdate,
-  refreshTasks,
-  rollbackTasks,
-} from "../utils/optimistic";
+const accessor = {
+  getItems: (page: TasksPage) => page.tasks,
+  withItems: (page: TasksPage, items: Task[]) => ({ ...page, tasks: items }),
+};
 
 export function useCreateTask() {
-  const queryClient = useQueryClient();
+  const { filter, sort } = useTasksStore();
 
-  const {
-    filter,
-    sort,
-  } = useTasksStore();
-
-  const queryKey = [
-    ...TASKS_QUERY_KEY,
-    filter,
-    sort,
-  ];
-
-  return useMutation({
+  return useOptimisticListMutation<Task, TasksPage, TasksCursor | null, Pick<NewTask, "title">>({
+    queryKey: [...TASKS_QUERY_KEY, filter, sort],
     mutationFn: createTask,
-
-    async onMutate(input) {
-      return optimisticUpdate(
-        queryClient,
-        queryKey,
-        (tasks) => {
-          const optimisticTask: Task = {
-            id: crypto.randomUUID(),
-            user_id: "",
-            title: input.title,
-            completed: false,
-            completed_at: null,
-            sort_order: 0,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          };
-
-          return [
-            optimisticTask,
-            ...tasks,
-          ];
-        },
-      );
-    },
-
-    onError(_error, _input, context) {
-      rollbackTasks(
-        queryClient,
-        queryKey,
-        context,
-      );
-    },
-
-    onSettled() {
-      refreshTasks(queryClient);
-    },
+    accessor,
+    emptyPage: { tasks: [], nextCursor: null },
+    emptyPageParam: null,
+    updateItems: (items, input) => [
+      {
+        id: crypto.randomUUID(),
+        user_id: "",
+        title: input.title,
+        completed: false,
+        completed_at: null,
+        sort_order: 0,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      ...items,
+    ],
   });
 }

@@ -1,75 +1,27 @@
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useOptimisticListMutation } from "@todo/query-toolkit";
 
 import { updateTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
 import { useTasksStore } from "../stores/tasks-ui.store";
+import type { Task, TasksCursor, TasksPage, UpdateTask } from "../types/task";
 
-import type { UpdateTask } from "../types/task";
+type UpdateTaskInput = { id: string; updates: UpdateTask };
 
-import {
-  optimisticUpdate,
-  refreshTasks,
-  rollbackTasks,
-} from "../utils/optimistic";
-
-type UpdateTaskInput = {
-  id: string;
-  updates: UpdateTask;
+const accessor = {
+  getItems: (page: TasksPage) => page.tasks,
+  withItems: (page: TasksPage, items: Task[]) => ({ ...page, tasks: items }),
 };
 
 export function useUpdateTask() {
-  const queryClient = useQueryClient();
+  const { filter, sort } = useTasksStore();
 
-  const {
-    filter,
-    sort,
-  } = useTasksStore();
-
-  const queryKey = [
-    ...TASKS_QUERY_KEY,
-    filter,
-    sort,
-  ];
-
-  return useMutation({
-    mutationFn: ({
-      id,
-      updates,
-    }: UpdateTaskInput) =>
-      updateTask(id, updates),
-
-    async onMutate({
-      id,
-      updates,
-    }) {
-      return optimisticUpdate(
-        queryClient,
-        queryKey,
-        (tasks) =>
-          tasks.map((task) =>
-            task.id === id
-              ? {
-                  ...task,
-                  ...updates,
-                }
-              : task,
-          ),
-      );
-    },
-
-    onError(_error, _input, context) {
-      rollbackTasks(
-        queryClient,
-        queryKey,
-        context,
-      );
-    },
-
-    onSettled() {
-      refreshTasks(queryClient);
-    },
+  return useOptimisticListMutation<Task, TasksPage, TasksCursor | null, UpdateTaskInput>({
+    queryKey: [...TASKS_QUERY_KEY, filter, sort],
+    mutationFn: ({ id, updates }) => updateTask(id, updates),
+    accessor,
+    emptyPage: { tasks: [], nextCursor: null },
+    emptyPageParam: null,
+    updateItems: (items, { id, updates }) =>
+      items.map((task) => (task.id === id ? { ...task, ...updates } : task)),
   });
 }

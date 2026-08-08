@@ -1,56 +1,24 @@
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useOptimisticListMutation } from "@todo/query-toolkit";
 
 import { deleteTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
 import { useTasksStore } from "../stores/tasks-ui.store";
+import type { Task, TasksCursor, TasksPage } from "../types/task";
 
-import {
-  optimisticUpdate,
-  refreshTasks,
-  rollbackTasks,
-} from "../utils/optimistic";
+const accessor = {
+  getItems: (page: TasksPage) => page.tasks,
+  withItems: (page: TasksPage, items: Task[]) => ({ ...page, tasks: items }),
+};
 
 export function useDeleteTask() {
-  const queryClient = useQueryClient();
+  const { filter, sort } = useTasksStore();
 
-  const {
-    filter,
-    sort,
-  } = useTasksStore();
-
-  const queryKey = [
-    ...TASKS_QUERY_KEY,
-    filter,
-    sort,
-  ];
-
-  return useMutation({
+  return useOptimisticListMutation<Task, TasksPage, TasksCursor | null, string>({
+    queryKey: [...TASKS_QUERY_KEY, filter, sort],
     mutationFn: deleteTask,
-
-    async onMutate(id) {
-      return optimisticUpdate(
-        queryClient,
-        queryKey,
-        (tasks) =>
-          tasks.filter(
-            (task) => task.id !== id,
-          ),
-      );
-    },
-
-    onError(_error, _id, context) {
-      rollbackTasks(
-        queryClient,
-        queryKey,
-        context,
-      );
-    },
-
-    onSettled() {
-      refreshTasks(queryClient);
-    },
+    accessor,
+    emptyPage: { tasks: [], nextCursor: null },
+    emptyPageParam: null,
+    updateItems: (items, id) => items.filter((task) => task.id !== id),
   });
 }

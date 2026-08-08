@@ -261,6 +261,9 @@ importers:
       '@todo/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
+      '@todo/query-toolkit':
+        specifier: workspace:*
+        version: link:../../packages/query-toolkit
       '@todo/supabase':
         specifier: workspace:*
         version: link:../../packages/supabase
@@ -364,6 +367,16 @@ importers:
         version: 6.0.3
 
   packages/env: {}
+
+  packages/query-toolkit:
+    dependencies:
+      '@tanstack/react-query':
+        specifier: '*'
+        version: 5.101.4(react@19.2.3)
+    devDependencies:
+      typescript:
+        specifier: ~6.0.3
+        version: 6.0.3
 
   packages/styling: {}
 
