@@ -71,9 +71,7 @@ export function PaginationToolbar({
                 backgroundColor: size === pageSize ? "#e5e5e5" : "transparent",
               }}
             >
-              <Text style={{ fontWeight: size === pageSize ? "700" : "400" }}>
-                {size}
-              </Text>
+              <Text style={{ fontWeight: size === pageSize ? "700" : "400" }}>{size}</Text>
             </Pressable>
           ))}
         </View>

@@ -34,9 +34,7 @@ export async function getTasksPage({
   const column = SORT_COLUMN[sort];
   const ascending = SORT_ASCENDING[sort];
 
-  let query = supabase
-    .from("tasks")
-    .select("*");
+  let query = supabase.from("tasks").select("*");
 
   switch (filter) {
     case "active":
@@ -48,10 +46,7 @@ export async function getTasksPage({
       break;
   }
 
-  query = query
-    .order(column, { ascending })
-    .order("id", { ascending: true })
-    .limit(limit);
+  query = query.order(column, { ascending }).order("id", { ascending: true }).limit(limit);
 
   if (cursor) {
     const op = ascending ? "lt" : "gt";
@@ -61,10 +56,7 @@ export async function getTasksPage({
     );
   }
 
-  const {
-    data,
-    error,
-  } = await query;
+  const { data, error } = await query;
 
   if (error) {
     throw error;
@@ -96,9 +88,7 @@ export async function getTasksPageOffset({
   const column = SORT_COLUMN[sort];
   const ascending = SORT_ASCENDING[sort];
 
-  let query = supabase
-    .from("tasks")
-    .select("*", { count: "exact" });
+  let query = supabase.from("tasks").select("*", { count: "exact" });
 
   switch (filter) {
     case "active":
@@ -113,16 +103,9 @@ export async function getTasksPageOffset({
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
-  query = query
-    .order(column, { ascending })
-    .order("id", { ascending: true })
-    .range(from, to);
+  query = query.order(column, { ascending }).order("id", { ascending: true }).range(from, to);
 
-  const {
-    data,
-    error,
-    count,
-  } = await query;
+  const { data, error, count } = await query;
 
   if (error) {
     throw error;
@@ -134,23 +117,16 @@ export async function getTasksPageOffset({
   };
 }
 
-export async function createTask(
-  input: Pick<NewTask, "title">,
-): Promise<Task> {
+export async function createTask(input: Pick<NewTask, "title">): Promise<Task> {
   const {
-    data: {
-      user,
-    },
+    data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
     throw new Error("User not authenticated");
   }
 
-  const {
-    data,
-    error,
-  } = await supabase
+  const { data, error } = await supabase
     .from("tasks")
     .insert({
       title: input.title,
@@ -166,14 +142,8 @@ export async function createTask(
   return data;
 }
 
-export async function updateTask(
-  id: string,
-  updates: UpdateTask,
-): Promise<Task> {
-  const {
-    data,
-    error,
-  } = await supabase
+export async function updateTask(id: string, updates: UpdateTask): Promise<Task> {
+  const { data, error } = await supabase
     .from("tasks")
     .update(updates)
     .eq("id", id)
@@ -187,30 +157,16 @@ export async function updateTask(
   return data;
 }
 
-export async function deleteTask(
-  id: string,
-): Promise<void> {
-  const {
-    error,
-  } = await supabase
-    .from("tasks")
-    .delete()
-    .eq("id", id);
+export async function deleteTask(id: string): Promise<void> {
+  const { error } = await supabase.from("tasks").delete().eq("id", id);
 
   if (error) {
     throw error;
   }
 }
 
-export async function moveTask({
-  taskId,
-  prevId,
-  nextId,
-}: MoveTaskInput): Promise<Task> {
-  const {
-    data,
-    error,
-  } = await supabase.rpc("move_task", {
+export async function moveTask({ taskId, prevId, nextId }: MoveTaskInput): Promise<Task> {
+  const { data, error } = await supabase.rpc("move_task", {
     p_task_id: taskId,
     p_prev_id: prevId ?? undefined,
     p_next_id: nextId ?? undefined,

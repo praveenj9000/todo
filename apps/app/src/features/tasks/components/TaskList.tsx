@@ -22,10 +22,7 @@ const emptyStateProps = {
   renderLoading: () => <Loading />,
   renderError: (retry: () => void) => <ErrorState onRetry={retry} />,
   renderEmpty: () => (
-    <EmptyState
-      title="No tasks yet"
-      description="Create your first task above."
-    />
+    <EmptyState title="No tasks yet" description="Create your first task above." />
   ),
 };
 
@@ -33,9 +30,7 @@ export function TaskList() {
   const sort = useTasksStore((state) => state.sort);
   const isSortable = FEATURES.dragSort.enabled && sort === TASK_SORTS.MANUAL;
 
-  const {
-    mutate: moveTask,
-  } = useMoveTask();
+  const { mutate: moveTask } = useMoveTask();
 
   function handleReorder(
     result: { itemId: string; prevId: string | null; nextId: string | null },
@@ -50,12 +45,7 @@ export function TaskList() {
   }
 
   if (PAGINATION_MODE === "paged") {
-    return (
-      <PagedTaskList
-        isSortable={isSortable}
-        onReorder={handleReorder}
-      />
-    );
+    return <PagedTaskList isSortable={isSortable} onReorder={handleReorder} />;
   }
 
   return (
@@ -85,15 +75,8 @@ function ScrollTaskList({
   ) => void;
   infiniteScroll: boolean;
 }) {
-  const {
-    data,
-    isPending,
-    isError,
-    refetch,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useTasks();
+  const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useTasks();
 
   const tasks: Task[] = data?.pages.flatMap((page) => page.tasks) ?? [];
 
@@ -105,9 +88,7 @@ function ScrollTaskList({
         isError={isError}
         onRetry={() => void refetch()}
         keyExtractor={(task) => task.id}
-        renderItem={(task) => (
-          <TaskItem key={task.id} task={task} draggable={isSortable} />
-        )}
+        renderItem={(task) => <TaskItem key={task.id} task={task} draggable={isSortable} />}
         dragSort={isSortable}
         activationDistance={8}
         onReorder={onReorder}
@@ -124,9 +105,7 @@ function ScrollTaskList({
       isError={isError}
       onRetry={() => void refetch()}
       keyExtractor={(task) => task.id}
-      renderItem={(task) => (
-        <TaskItem key={task.id} task={task} draggable={isSortable} />
-      )}
+      renderItem={(task) => <TaskItem key={task.id} task={task} draggable={isSortable} />}
       dragSort={isSortable}
       activationDistance={8}
       onReorder={onReorder}
@@ -154,13 +133,7 @@ function PagedTaskList({
     items: Task[],
   ) => void;
 }) {
-  const {
-    data,
-    isPending,
-    isError,
-    refetch,
-    isFetching,
-  } = useTasksPaged();
+  const { data, isPending, isError, refetch, isFetching } = useTasksPaged();
 
   const page = useTasksStore((state) => state.page);
   const pageSize = useTasksStore((state) => state.pageSize);
@@ -178,9 +151,7 @@ function PagedTaskList({
       isError={isError}
       onRetry={() => void refetch()}
       keyExtractor={(task) => task.id}
-      renderItem={(task) => (
-        <TaskItem key={task.id} task={task} draggable={isSortable} />
-      )}
+      renderItem={(task) => <TaskItem key={task.id} task={task} draggable={isSortable} />}
       dragSort={isSortable}
       onReorder={onReorder}
       pagination="paged"

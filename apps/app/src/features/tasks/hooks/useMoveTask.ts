@@ -1,7 +1,4 @@
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   cancelListQuery,
@@ -18,13 +15,7 @@ import { FEATURES } from "@/config/features";
 import { moveTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
 import { useTasksStore } from "../stores/tasks-ui.store";
-import type {
-  MoveTaskInput,
-  Task,
-  TasksCursor,
-  TasksOffsetPage,
-  TasksPage,
-} from "../types/task";
+import type { MoveTaskInput, Task, TasksCursor, TasksOffsetPage, TasksPage } from "../types/task";
 
 type MoveTaskVariables = MoveTaskInput & { items: Task[] };
 

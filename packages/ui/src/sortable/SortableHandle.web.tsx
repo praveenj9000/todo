@@ -1,18 +1,9 @@
-import type {
-  PropsWithChildren,
-} from "react";
+import type { PropsWithChildren } from "react";
 
-import {
-  useSortableItem,
-} from "./SortableItem.web";
+import { useSortableItem } from "./SortableItem.web";
 
-export function SortableHandle({
-  children,
-}: PropsWithChildren) {
-  const {
-    listeners,
-    attributes,
-  } = useSortableItem();
+export function SortableHandle({ children }: PropsWithChildren) {
+  const { listeners, attributes } = useSortableItem();
 
   return (
     <div

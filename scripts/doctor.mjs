@@ -56,10 +56,7 @@ function checkEnv() {
   }
 
   const contents = readFileSync(".env", "utf-8");
-  const required = [
-    "EXPO_PUBLIC_SUPABASE_URL",
-    "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
-  ];
+  const required = ["EXPO_PUBLIC_SUPABASE_URL", "EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY"];
 
   for (const key of required) {
     const match = contents.match(new RegExp(`^${key}=(.*)$`, "m"));
@@ -101,9 +98,7 @@ function checkExpoDependencies() {
   } catch (error) {
     warning("Some dependencies may not match the installed Expo SDK");
     console.log(error.stdout?.toString() ?? "");
-    console.log(
-      "Fix with: pnpm --filter @todo/app add <package>@<expected-version>",
-    );
+    console.log("Fix with: pnpm --filter @todo/app add <package>@<expected-version>");
     hasWarnings = true;
   }
 }

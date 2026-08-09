@@ -6,9 +6,9 @@ This guide explains how to set up the project on a new machine.
 
 Install the following before getting started:
 
-* Node.js 24 or newer — verify this against `apps/app/package.json`'s `@types/node` version, which currently suggests a newer major; confirm the actual required runtime version before relying on this number.
-* pnpm 11 or newer
-* Git
+- Node.js 24 or newer — verify this against `apps/app/package.json`'s `@types/node` version, which currently suggests a newer major; confirm the actual required runtime version before relying on this number.
+- pnpm 11 or newer
+- Git
 
 Verify the installation:
 
@@ -48,12 +48,12 @@ pnpm setup
 
 The setup script will:
 
-* Verify Node.js
-* Verify pnpm
-* Install dependencies (if needed)
-* Sync environment variables
-* Verify the Supabase CLI is available
-* Run a TypeScript type check
+- Verify Node.js
+- Verify pnpm
+- Install dependencies (if needed)
+- Sync environment variables
+- Verify the Supabase CLI is available
+- Run a TypeScript type check
 
 If everything succeeds, the project is ready to run.
 
@@ -128,6 +128,22 @@ pnpm verify-migration
 ```
 
 Compares local migration files against what the linked Supabase project has recorded as applied. `db:push` reporting success doesn't always mean what you expect it means — use this to confirm local and remote actually agree before trusting a migration landed.
+
+### Formatting
+
+```bash
+pnpm format
+```
+
+Formats the entire repo with Prettier. Config lives in `.prettierrc.json`.
+
+```bash
+pnpm format:check
+```
+
+Checks formatting without writing changes — useful in CI.
+
+A pre-commit hook (via Husky) automatically checks that staged files are formatted before allowing a commit. If it blocks you, run `pnpm format` and re-stage.
 
 ## Project Structure
 
@@ -214,5 +230,5 @@ pnpm dlx supabase --version
 
 ## Additional Documentation
 
-* `docs/supabase.md` — Database migrations and Supabase workflow.
-* `docs/architecture.md` — Project architecture.
+- `docs/supabase.md` — Database migrations and Supabase workflow.
+- `docs/architecture.md` — Project architecture.

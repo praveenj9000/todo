@@ -1,32 +1,18 @@
-import {
-  createContext,
-  useContext,
-} from "react";
+import { createContext, useContext } from "react";
 
-import type {
-  PropsWithChildren,
-} from "react";
+import type { PropsWithChildren } from "react";
 
-import type {
-  SortableItemProps,
-} from "./types";
+import type { SortableItemProps } from "./types";
 
 type ContextValue = {
   drag: () => void;
 };
 
-const Context =
-  createContext<ContextValue | null>(
-    null,
-  );
+const Context = createContext<ContextValue | null>(null);
 
-type ProviderProps =
-  PropsWithChildren<ContextValue>;
+type ProviderProps = PropsWithChildren<ContextValue>;
 
-export function SortableItemContextProvider({
-  children,
-  drag,
-}: ProviderProps) {
+export function SortableItemContextProvider({ children, drag }: ProviderProps) {
   return (
     <Context.Provider
       value={{
@@ -39,20 +25,15 @@ export function SortableItemContextProvider({
 }
 
 export function useSortableItem() {
-  const context =
-    useContext(Context);
+  const context = useContext(Context);
 
   if (!context) {
-    throw new Error(
-      "SortableItem must be inside SortableList.",
-    );
+    throw new Error("SortableItem must be inside SortableList.");
   }
 
   return context;
 }
 
-export function SortableItem({
-  children,
-}: SortableItemProps) {
+export function SortableItem({ children }: SortableItemProps) {
   return children;
 }

@@ -1,18 +1,10 @@
-import type {
-  ComponentType,
-  PropsWithChildren,
-} from "react";
+import type { ComponentType, PropsWithChildren } from "react";
 
-import {
-  Button,
-  Text,
-  XStack,
-} from "tamagui";
+import { Button, Text, XStack } from "tamagui";
 
 import type { Task } from "../types/task";
 
-type DragHandleComponent =
-  ComponentType<PropsWithChildren>;
+type DragHandleComponent = ComponentType<PropsWithChildren>;
 
 type Props = {
   task: Task;
@@ -21,45 +13,24 @@ type Props = {
   DragHandle?: DragHandleComponent;
 };
 
-export function TaskRow({
-  task,
-  onToggleCompleted,
-  onDelete,
-  DragHandle,
-}: Props) {
+export function TaskRow({ task, onToggleCompleted, onDelete, DragHandle }: Props) {
   return (
-    <XStack
-      padding="$4"
-      gap="$3"
-      alignItems="center"
-    >
+    <XStack padding="$4" gap="$3" alignItems="center">
       {DragHandle ? (
         <DragHandle>
-          <Button
-            chromeless
-            size="$3"
-          >
+          <Button chromeless size="$3">
             ☰
           </Button>
         </DragHandle>
       ) : null}
 
-      <Button
-        size="$3"
-        onPress={onToggleCompleted}
-      >
+      <Button size="$3" onPress={onToggleCompleted}>
         {task.completed ? "✓" : "○"}
       </Button>
 
-      <Text flex={1}>
-        {task.title}
-      </Text>
+      <Text flex={1}>{task.title}</Text>
 
-      <Button
-        size="$3"
-        theme="red"
-        onPress={onDelete}
-      >
+      <Button size="$3" theme="red" onPress={onDelete}>
         Delete
       </Button>
     </XStack>

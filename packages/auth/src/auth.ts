@@ -1,21 +1,13 @@
 import type { SupabaseClient, AuthChangeEvent, Session } from "@supabase/supabase-js";
 
-export async function signIn(
-  supabase: SupabaseClient,
-  email: string,
-  password: string
-) {
+export async function signIn(supabase: SupabaseClient, email: string, password: string) {
   return supabase.auth.signInWithPassword({
     email,
     password,
   });
 }
 
-export async function signUp(
-  supabase: SupabaseClient,
-  email: string,
-  password: string
-) {
+export async function signUp(supabase: SupabaseClient, email: string, password: string) {
   return supabase.auth.signUp({
     email,
     password,
@@ -32,10 +24,7 @@ export function getSession(supabase: SupabaseClient) {
 
 export function onAuthStateChange(
   supabase: SupabaseClient,
-  callback: (
-    event: AuthChangeEvent,
-    session: Session | null
-  ) => void
+  callback: (event: AuthChangeEvent, session: Session | null) => void,
 ) {
   return supabase.auth.onAuthStateChange(callback);
 }

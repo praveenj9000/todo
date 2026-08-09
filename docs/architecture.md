@@ -374,7 +374,7 @@ List rendering is generalized in `@todo/ui` and configured per screen, not hardc
 
 - **Pagination modes** — `none` (fetch everything), `infiniteScroll` (cursor/keyset-based, safe under concurrent reordering), `paged` (offset-based, supports a numbered toolbar with jump-to-page, at the accepted cost of reduced correctness guarantees under concurrent drag-reordering across page boundaries).
 - **Virtualization** — `List` is virtualized on both platforms (`@tanstack/react-virtual` on web, tuned `FlatList` on native) and is the intended component for large or unbounded datasets.
-- **Drag-to-reorder** — `SortableList`, intentionally *not* virtualized. Manual reordering is a bounded, human-curated interaction (dozens–low hundreds of items) by nature; combining it with virtualization was evaluated and deliberately deferred, not overlooked.
+- **Drag-to-reorder** — `SortableList`, intentionally _not_ virtualized. Manual reordering is a bounded, human-curated interaction (dozens–low hundreds of items) by nature; combining it with virtualization was evaluated and deliberately deferred, not overlooked.
 - Both pagination and drag-sort are independent, per-instance opt-in props on `List` — a screen can combine them freely (e.g. a small drag-sortable, unpaginated list; a large paginated, non-sortable list).
 
 ---

@@ -11,9 +11,7 @@ export function AppProvider({ children }: Props) {
   return (
     <DesignSystemProvider>
       <QueryProvider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </QueryProvider>
     </DesignSystemProvider>
   );

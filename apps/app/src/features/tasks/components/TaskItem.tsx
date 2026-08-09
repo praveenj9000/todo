@@ -9,26 +9,17 @@ type Props = {
   draggable?: boolean;
 };
 
-export function TaskItem({
-  task,
-  draggable = false,
-}: Props) {
-  const {
-    mutateAsync: updateTask,
-  } = useUpdateTask();
+export function TaskItem({ task, draggable = false }: Props) {
+  const { mutateAsync: updateTask } = useUpdateTask();
 
-  const {
-    mutateAsync: deleteTask,
-  } = useDeleteTask();
+  const { mutateAsync: deleteTask } = useDeleteTask();
 
   async function toggleCompleted() {
     await updateTask({
       id: task.id,
       updates: {
         completed: !task.completed,
-        completed_at: task.completed
-          ? null
-          : new Date().toISOString(),
+        completed_at: task.completed ? null : new Date().toISOString(),
       },
     });
   }
@@ -46,9 +37,5 @@ export function TaskItem({
     />
   );
 
-  return draggable ? (
-    <SortableItem id={task.id}>{row}</SortableItem>
-  ) : (
-    row
-  );
+  return draggable ? <SortableItem id={task.id}>{row}</SortableItem> : row;
 }

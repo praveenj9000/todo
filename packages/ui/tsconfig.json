@@ -4,7 +4,5 @@
     "noEmit": true,
     "moduleSuffixes": [".native", ".web", ""]
   },
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

@@ -31,9 +31,7 @@ type Props = {
   children: ReactNode;
 };
 
-export function QueryProvider({
-  children,
-}: Props) {
+export function QueryProvider({ children }: Props) {
   useEffect(() => {
     return setupOnlineManager();
   }, []);

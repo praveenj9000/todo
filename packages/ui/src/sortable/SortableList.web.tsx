@@ -17,9 +17,7 @@ import {
   arrayMove,
 } from "@dnd-kit/sortable";
 
-import type {
-  SortableListProps,
-} from "./types";
+import type { SortableListProps } from "./types";
 
 export function SortableList<T>({
   data,
@@ -32,21 +30,16 @@ export function SortableList<T>({
   hasNextPage,
   isFetchingNextPage,
 }: SortableListProps<T>) {
-  const sensors =
-    useSensors(
-      useSensor(PointerSensor, {
-        activationConstraint: {
-          distance: activationDistance,
-        },
-      }),
-      useSensor(
-        KeyboardSensor,
-        {
-          coordinateGetter:
-            sortableKeyboardCoordinates,
-        },
-      ),
-    );
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: activationDistance,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -80,23 +73,14 @@ export function SortableList<T>({
     return () => observer.disconnect();
   }, [onEndReached, hasNextPage, isFetchingNextPage, onEndReachedThreshold]);
 
-  function handleDragEnd({
-    active,
-    over,
-  }: DragEndEvent) {
+  function handleDragEnd({ active, over }: DragEndEvent) {
     if (!over || active.id === over.id) {
       return;
     }
 
-    const oldIndex =
-      data.findIndex(
-        (item) => keyExtractor(item) === active.id,
-      );
+    const oldIndex = data.findIndex((item) => keyExtractor(item) === active.id);
 
-    const newIndex =
-      data.findIndex(
-        (item) => keyExtractor(item) === over.id,
-      );
+    const newIndex = data.findIndex((item) => keyExtractor(item) === over.id);
 
     const reordered = arrayMove(data, oldIndex, newIndex);
 
@@ -122,21 +106,12 @@ export function SortableList<T>({
         overflowY: "auto",
       }}
     >
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
-        <SortableContext
-          items={data.map(keyExtractor)}
-          strategy={verticalListSortingStrategy}
-        >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={data.map(keyExtractor)} strategy={verticalListSortingStrategy}>
           {data.map(renderItem)}
         </SortableContext>
 
-        {onEndReached ? (
-          <div ref={sentinelRef} style={{ height: 1 }} />
-        ) : null}
+        {onEndReached ? <div ref={sentinelRef} style={{ height: 1 }} /> : null}
       </DndContext>
     </div>
   );

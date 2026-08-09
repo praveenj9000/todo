@@ -1,8 +1,4 @@
-import {
-  useMutation,
-  useQueryClient,
-  type QueryKey,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient, type QueryKey } from "@tanstack/react-query";
 
 import {
   cancelListQuery,
@@ -24,9 +20,12 @@ export type ListMutationConfig<TItem extends EntityWithId, TPage, TPageParam, TV
   emptyPageParam: TPageParam;
 };
 
-export function useOptimisticListMutation<TItem extends EntityWithId, TPage, TPageParam, TVariables>(
-  config: ListMutationConfig<TItem, TPage, TPageParam, TVariables>,
-) {
+export function useOptimisticListMutation<
+  TItem extends EntityWithId,
+  TPage,
+  TPageParam,
+  TVariables,
+>(config: ListMutationConfig<TItem, TPage, TPageParam, TVariables>) {
   const queryClient = useQueryClient();
 
   return useMutation({

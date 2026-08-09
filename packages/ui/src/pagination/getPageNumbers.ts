@@ -10,10 +10,7 @@ export function getPageNumbers(
   const totalVisible = siblingCount * 2 + 5;
 
   if (totalPages <= totalVisible) {
-    return Array.from(
-      { length: totalPages },
-      (_, i) => i + 1,
-    );
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
   }
 
   const leftSibling = Math.max(page - siblingCount, 2);

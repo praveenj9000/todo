@@ -3,9 +3,7 @@ import DraggableFlatList, {
   type RenderItemParams,
 } from "react-native-draggable-flatlist";
 
-import type {
-  SortableListProps,
-} from "./types";
+import type { SortableListProps } from "./types";
 
 import { SortableItemContextProvider } from "./SortableItem.native";
 
@@ -26,16 +24,9 @@ export function SortableList<T>({
       activationDistance={activationDistance}
       onEndReached={onEndReached}
       onEndReachedThreshold={onEndReachedThreshold}
-      renderItem={({
-        item,
-        drag,
-      }: RenderItemParams<T>) => (
-        <SortableItemContextProvider
-          drag={drag}
-        >
-          <ScaleDecorator>
-            {renderItem(item)}
-          </ScaleDecorator>
+      renderItem={({ item, drag }: RenderItemParams<T>) => (
+        <SortableItemContextProvider drag={drag}>
+          <ScaleDecorator>{renderItem(item)}</ScaleDecorator>
         </SortableItemContextProvider>
       )}
       onDragEnd={({ data: reordered, from, to }) => {

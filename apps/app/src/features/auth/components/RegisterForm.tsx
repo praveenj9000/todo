@@ -27,10 +27,7 @@ export function RegisterForm() {
   }
 
   return (
-    <YStack
-      gap="$4"
-      width="100%"
-    >
+    <YStack gap="$4" width="100%">
       <Input
         placeholder="Email"
         value={email}
@@ -39,25 +36,13 @@ export function RegisterForm() {
         keyboardType="email-address"
       />
 
-      <Input
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <Input placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
 
-      <Button
-        onPress={handleRegister}
-        disabled={loading}
-      >
+      <Button onPress={handleRegister} disabled={loading}>
         {loading ? "Creating account..." : "Register"}
       </Button>
 
-      {error ? (
-        <Text color="$red10">
-          {error}
-        </Text>
-      ) : null}
+      {error ? <Text color="$red10">{error}</Text> : null}
     </YStack>
   );
 }

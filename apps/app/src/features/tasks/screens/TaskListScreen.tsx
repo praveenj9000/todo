@@ -9,10 +9,7 @@ export function TaskListScreen() {
       <AddTaskForm />
       <TaskFilters />
 
-      <YStack
-        flex={1}
-        minHeight={0}
-      >
+      <YStack flex={1} minHeight={0}>
         <TaskList />
       </YStack>
     </YStack>

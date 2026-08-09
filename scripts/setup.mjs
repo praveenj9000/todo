@@ -46,9 +46,7 @@ function checkPnpm() {
   section("pnpm");
 
   try {
-    const version = execSync("pnpm --version")
-      .toString()
-      .trim();
+    const version = execSync("pnpm --version").toString().trim();
 
     success(version);
   } catch {

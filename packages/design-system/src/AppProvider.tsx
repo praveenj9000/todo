@@ -7,10 +7,7 @@ type Props = {
 
 export function DesignSystemProvider({ children }: Props) {
   return (
-    <TamaguiProvider
-      config={tamaguiConfig}
-      defaultTheme="light"
-    >
+    <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
       {children}
     </TamaguiProvider>
   );

@@ -24,15 +24,7 @@ if (existsSync(featureRoot)) {
   process.exit(1);
 }
 
-const folders = [
-  "api",
-  "components",
-  "constants",
-  "hooks",
-  "screens",
-  "stores",
-  "types",
-];
+const folders = ["api", "components", "constants", "hooks", "screens", "stores", "types"];
 
 for (const folder of folders) {
   mkdirSync(resolve(featureRoot, folder), { recursive: true });

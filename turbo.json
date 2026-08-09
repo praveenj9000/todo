@@ -7,10 +7,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [
-        "dist/**",
-        ".expo/**"
-      ]
+      "outputs": ["dist/**", ".expo/**"]
     },
     "typecheck": {
       "dependsOn": ["^typecheck"]

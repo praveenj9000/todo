@@ -10,6 +10,9 @@
     "check-env": "node scripts/doctor.mjs",
     "new-feature": "node scripts/new-feature.mjs",
     "verify-migration": "node scripts/verify-migration.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:staged": "node scripts/check-format.mjs",
     "dev": "pnpm sync-env && turbo dev",
     "build": "pnpm sync-env && turbo build",
     "typecheck": "turbo typecheck",
@@ -22,11 +25,13 @@
     "db:pull": "pnpm dlx supabase db pull",
     "db:reset": "pnpm dlx supabase db reset",
     "db:types": "pnpm dlx supabase gen types typescript --linked > packages/types/src/database.ts",
-    "db:new": "pnpm dlx supabase migration new"
+    "db:new": "pnpm dlx supabase migration new",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@types/node": "^26.1.2",
     "cpy-cli": "^7.0.0",
+    "husky": "^9.1.7",
     "prettier": "^3.9.6",
     "turbo": "2.10.8",
     "typescript": "6.0.3"

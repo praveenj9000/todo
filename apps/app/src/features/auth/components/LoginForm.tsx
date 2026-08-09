@@ -27,10 +27,7 @@ export function LoginForm() {
   }
 
   return (
-    <YStack
-      gap="$4"
-      width="100%"
-    >
+    <YStack gap="$4" width="100%">
       <Input
         placeholder="Email"
         value={email}
@@ -39,25 +36,13 @@ export function LoginForm() {
         keyboardType="email-address"
       />
 
-      <Input
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <Input placeholder="Password" value={password} onChangeText={setPassword} secureTextEntry />
 
-      <Button
-        onPress={handleLogin}
-        disabled={loading}
-      >
+      <Button onPress={handleLogin} disabled={loading}>
         {loading ? "Signing in..." : "Login"}
       </Button>
 
-      {error ? (
-        <Text color="$red10">
-          {error}
-        </Text>
-      ) : null}
+      {error ? <Text color="$red10">{error}</Text> : null}
     </YStack>
   );
 }

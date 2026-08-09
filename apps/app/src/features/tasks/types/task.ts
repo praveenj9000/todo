@@ -1,17 +1,11 @@
 import type { Database } from "@todo/types";
-import type {
-  TaskFilter,
-  TaskSort,
-} from "../constants/tasks";
+import type { TaskFilter, TaskSort } from "../constants/tasks";
 
-export type Task =
-  Database["public"]["Tables"]["tasks"]["Row"];
+export type Task = Database["public"]["Tables"]["tasks"]["Row"];
 
-export type NewTask =
-  Database["public"]["Tables"]["tasks"]["Insert"];
+export type NewTask = Database["public"]["Tables"]["tasks"]["Insert"];
 
-export type UpdateTask =
-  Database["public"]["Tables"]["tasks"]["Update"];
+export type UpdateTask = Database["public"]["Tables"]["tasks"]["Update"];
 
 export type TasksCursor = {
   primary: string | number;

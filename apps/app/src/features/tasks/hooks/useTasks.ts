@@ -12,17 +12,10 @@ const PAGE_SIZE = FEATURES.pagination.enabled
   : Number.MAX_SAFE_INTEGER;
 
 export function useTasks() {
-  const {
-    filter,
-    sort,
-  } = useTasksStore();
+  const { filter, sort } = useTasksStore();
 
   return useInfiniteQuery({
-    queryKey: [
-      ...TASKS_QUERY_KEY,
-      filter,
-      sort,
-    ],
+    queryKey: [...TASKS_QUERY_KEY, filter, sort],
 
     queryFn: ({ pageParam }) =>
       getTasksPage({
@@ -34,7 +27,6 @@ export function useTasks() {
 
     initialPageParam: null as TasksCursor | null,
 
-    getNextPageParam: (lastPage) =>
-      FEATURES.pagination.enabled ? lastPage.nextCursor : null,
+    getNextPageParam: (lastPage) => (FEATURES.pagination.enabled ? lastPage.nextCursor : null),
   });
 }

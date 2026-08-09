@@ -14,9 +14,7 @@ if (name !== rawName) {
 }
 
 if (!/^[a-z0-9_]+$/i.test(name)) {
-  console.error(
-    `✖ Invalid migration name "${name}". Use only letters, numbers, and underscores.`,
-  );
+  console.error(`✖ Invalid migration name "${name}". Use only letters, numbers, and underscores.`);
   process.exit(1);
 }
 

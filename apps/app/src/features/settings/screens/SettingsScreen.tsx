@@ -7,14 +7,8 @@ export default function SettingsScreen() {
   }
 
   return (
-    <YStack
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Button onPress={handleLogout}>
-        Logout
-      </Button>
+    <YStack flex={1} justifyContent="center" alignItems="center">
+      <Button onPress={handleLogout}>Logout</Button>
     </YStack>
   );
 }

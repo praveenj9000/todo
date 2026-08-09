@@ -51,9 +51,9 @@ docs/
 
 ## Documentation
 
-* `docs/setup.md` — Complete project setup guide.
-* `docs/supabase.md` — Supabase workflow and database migrations.
-* `docs/architecture.md` — Project architecture (coming soon).
+- `docs/setup.md` — Complete project setup guide.
+- `docs/supabase.md` — Supabase workflow and database migrations.
+- `docs/architecture.md` — Project architecture (coming soon).
 
 ## License
 

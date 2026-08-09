@@ -1,12 +1,6 @@
-import {
-  Button,
-  XStack,
-} from "tamagui";
+import { Button, XStack } from "tamagui";
 
-import {
-  TASK_FILTERS,
-  TaskFilter,
-} from "../constants/tasks";
+import { TASK_FILTERS, TaskFilter } from "../constants/tasks";
 
 import { useTasksStore } from "../stores/tasks-ui.store";
 
@@ -29,30 +23,17 @@ const FILTERS: {
 ];
 
 export function TaskFilters() {
-  const filter = useTasksStore(
-    (state) => state.filter
-  );
+  const filter = useTasksStore((state) => state.filter);
 
-  const setFilter = useTasksStore(
-    (state) => state.setFilter
-  );
+  const setFilter = useTasksStore((state) => state.setFilter);
 
   return (
-    <XStack
-      gap="$2"
-      padding="$4"
-    >
+    <XStack gap="$2" padding="$4">
       {FILTERS.map((item) => (
         <Button
           key={item.value}
-          theme={
-            filter === item.value
-              ? "active"
-              : undefined
-          }
-          onPress={() =>
-            setFilter(item.value)
-          }
+          theme={filter === item.value ? "active" : undefined}
+          onPress={() => setFilter(item.value)}
         >
           {item.label}
         </Button>

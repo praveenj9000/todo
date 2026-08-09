@@ -54,13 +54,13 @@ Write all schema changes inside the generated SQL file.
 
 Examples:
 
-* Create tables
-* Alter tables
-* Create indexes
-* Enable Row Level Security
-* Create policies
-* Create triggers
-* Create functions
+- Create tables
+- Alter tables
+- Create indexes
+- Enable Row Level Security
+- Create policies
+- Create triggers
+- Create functions
 
 Never edit previously applied migration files.
 
@@ -176,28 +176,28 @@ No additional setup is required.
 
 # Useful Commands
 
-| Command                      | Description                                                      |
-| ---------------------------- | ---------------------------------------------------------------- |
-| `pnpm db:login`              | Authenticate the Supabase CLI.                                   |
-| `pnpm db:link`               | Link the repository to a Supabase project.                       |
-| `pnpm db:new <name>`         | Create a new migration. Automatically strips a trailing `.sql` if you include one, and validates the name.  |
-| `pnpm db:push`               | Apply pending migrations.                                        |
-| `pnpm db:pull`               | Pull the remote schema into local migrations (rarely needed).    |
-| `pnpm db:types`              | Generate TypeScript database types.                              |
-| `pnpm db:reset`              | Reset the linked database. See Supabase CLI docs for local-dev usage (`supabase start`), which is not otherwise part of this repo's documented workflow. |
-| `supabase migration list`    | Compare local migration files against what's applied remotely.   |
+| Command                   | Description                                                                                                                                              |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm db:login`           | Authenticate the Supabase CLI.                                                                                                                           |
+| `pnpm db:link`            | Link the repository to a Supabase project.                                                                                                               |
+| `pnpm db:new <name>`      | Create a new migration. Automatically strips a trailing `.sql` if you include one, and validates the name.                                               |
+| `pnpm db:push`            | Apply pending migrations.                                                                                                                                |
+| `pnpm db:pull`            | Pull the remote schema into local migrations (rarely needed).                                                                                            |
+| `pnpm db:types`           | Generate TypeScript database types.                                                                                                                      |
+| `pnpm db:reset`           | Reset the linked database. See Supabase CLI docs for local-dev usage (`supabase start`), which is not otherwise part of this repo's documented workflow. |
+| `supabase migration list` | Compare local migration files against what's applied remotely.                                                                                           |
 
 ---
 
 # Best Practices
 
-* Treat migrations as the source of truth.
-* Create a new migration for every schema change.
-* Never modify an applied migration.
-* After `db:push`, verify the migration actually applied — don't rely on the command's success alone.
-* Generate database types after every migration.
-* Commit migrations and generated types together.
-* Avoid making schema changes directly in the Supabase Dashboard.
-* Keep all schema history in Git.
+- Treat migrations as the source of truth.
+- Create a new migration for every schema change.
+- Never modify an applied migration.
+- After `db:push`, verify the migration actually applied — don't rely on the command's success alone.
+- Generate database types after every migration.
+- Commit migrations and generated types together.
+- Avoid making schema changes directly in the Supabase Dashboard.
+- Keep all schema history in Git.
 
 Following these practices ensures every developer can recreate the database from the repository alone.
