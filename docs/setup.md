@@ -232,3 +232,15 @@ pnpm dlx supabase --version
 
 - `docs/supabase.md` — Database migrations and Supabase workflow.
 - `docs/architecture.md` — Project architecture.
+
+### Testing
+
+```bash
+pnpm test
+```
+
+Runs Vitest across every workspace package that has a `test` script, via Turborepo.
+
+Currently covered: `@todo/query-toolkit` (optimistic cache logic) and `@todo/ui`'s pagination math (`getPageNumbers`). These are pure-logic tests with no DOM or Supabase mocking required — the highest-risk, most reused code in the repo, tested first.
+
+Component and hook-level testing for `apps/app` (React Testing Library, mocked Supabase client) is a planned follow-up, not yet in place.

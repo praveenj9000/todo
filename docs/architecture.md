@@ -466,6 +466,7 @@ Completed:
 - Generic optimistic-cache mutation helpers (`@todo/query-toolkit`)
 - Shared UI components (`@todo/design-system`: `EmptyState`, `ErrorState`, `Loading`)
 - Offline read support (persisted query cache) and same-session offline mutation retry on reconnect
+- Unit tests for @todo/query-toolkit and @todo/ui pagination logic
 
 Upcoming:
 
@@ -474,5 +475,5 @@ Upcoming:
 - Multi-device conflict resolution
 - Google Sign-In
 - Apple Sign-In
-- Testing
+- Component/hook-level testing for apps/app (React Testing Library, mocked Supabase)
 - CI/CD

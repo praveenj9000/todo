@@ -13,6 +13,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:staged": "node scripts/check-format.mjs",
+    "test": "turbo test",
     "dev": "pnpm sync-env && turbo dev",
     "build": "pnpm sync-env && turbo build",
     "typecheck": "turbo typecheck",
@@ -34,6 +35,7 @@
     "husky": "^9.1.7",
     "prettier": "^3.9.6",
     "turbo": "2.10.8",
-    "typescript": "6.0.3"
+    "typescript": "6.0.3",
+    "vitest": "^3.2.4"
   }
 }

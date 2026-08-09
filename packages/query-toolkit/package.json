@@ -11,9 +11,11 @@
     "@react-native-community/netinfo": "*"
   },
   "devDependencies": {
+    "vitest": "^3.2.4",
     "typescript": "~6.0.3"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
   }
 }
