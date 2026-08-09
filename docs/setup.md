@@ -143,7 +143,7 @@ pnpm format:check
 
 Checks formatting without writing changes — useful in CI.
 
-A pre-commit hook (via Husky) automatically checks that staged files are formatted before allowing a commit. If it blocks you, run `pnpm format` and re-stage.
+A pre-commit hook (via Husky + lint-staged) automatically formats staged files with Prettier before each commit — no manual `pnpm format` step needed. If a file gets reformatted, it's re-staged automatically as part of the commit.
 
 ## Project Structure
 

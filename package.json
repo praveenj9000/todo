@@ -12,7 +12,7 @@
     "verify-migration": "node scripts/verify-migration.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "format:staged": "node scripts/check-format.mjs",
+    "format:staged": "lint-staged",
     "test": "turbo test",
     "dev": "pnpm sync-env && turbo dev",
     "build": "pnpm sync-env && turbo build",
@@ -33,9 +33,13 @@
     "@types/node": "^26.1.2",
     "cpy-cli": "^7.0.0",
     "husky": "^9.1.7",
+    "lint-staged": "^17.3.0",
     "prettier": "^3.9.6",
     "turbo": "2.10.8",
     "typescript": "6.0.3",
     "vitest": "^3.2.4"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,md}": "prettier --write"
   }
 }
