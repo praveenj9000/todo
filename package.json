@@ -7,6 +7,9 @@
   "scripts": {
     "setup": "node scripts/setup.mjs",
     "sync-env": "node scripts/sync-env.mjs",
+    "check-env": "node scripts/doctor.mjs",
+    "new-feature": "node scripts/new-feature.mjs",
+    "verify-migration": "node scripts/verify-migration.mjs",
     "dev": "pnpm sync-env && turbo dev",
     "build": "pnpm sync-env && turbo build",
     "typecheck": "turbo typecheck",
