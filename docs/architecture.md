@@ -467,6 +467,7 @@ Completed:
 - Shared UI components (`@todo/design-system`: `EmptyState`, `ErrorState`, `Loading`)
 - Offline read support (persisted query cache) and same-session offline mutation retry on reconnect
 - Unit tests for @todo/query-toolkit and @todo/ui pagination logic
+- CI: automated formatting, typecheck, and test checks on every push/PR
 
 Upcoming:
 
@@ -476,4 +477,4 @@ Upcoming:
 - Google Sign-In
 - Apple Sign-In
 - Component/hook-level testing for apps/app (React Testing Library, mocked Supabase)
-- CI/CD
+- CD: automated builds/deploys via EAS (requires Expo account + EXPO_TOKEN secret)

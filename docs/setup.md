@@ -244,3 +244,17 @@ Runs Vitest across every workspace package that has a `test` script, via Turbore
 Currently covered: `@todo/query-toolkit` (optimistic cache logic) and `@todo/ui`'s pagination math (`getPageNumbers`). These are pure-logic tests with no DOM or Supabase mocking required — the highest-risk, most reused code in the repo, tested first.
 
 Component and hook-level testing for `apps/app` (React Testing Library, mocked Supabase client) is a planned follow-up, not yet in place.
+
+## Continuous Integration
+
+Every push and pull request against `main` runs `.github/workflows/ci.yml`, which checks:
+
+- Formatting (`pnpm format:check`)
+- TypeScript (`pnpm typecheck`)
+- Tests (`pnpm test`)
+
+CI does not require any GitHub Secrets — it writes placeholder values for `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` since none of the CI checks make real Supabase calls.
+
+To make these checks required before merging, enable branch protection on `main` in the repository settings and require the `ci` status check to pass.
+
+Continuous Deployment (building and publishing the app via EAS) is not yet configured — see `docs/architecture.md`'s Upcoming section.
