@@ -14,6 +14,7 @@ import { FEATURES } from "@/config/features";
 
 import { moveTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
+import { TASK_MUTATION_KEYS } from "../constants/mutation-keys";
 import { useTasksStore } from "../stores/tasks-ui.store";
 import type { MoveTaskInput, Task, TasksCursor, TasksOffsetPage, TasksPage } from "../types/task";
 
@@ -39,6 +40,7 @@ export function useMoveTask() {
   const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", filter, sort, page, pageSize];
 
   return useMutation({
+    mutationKey: TASK_MUTATION_KEYS.move,
     mutationFn: ({ taskId, prevId, nextId }: MoveTaskVariables) =>
       moveTask({ taskId, prevId, nextId }),
 

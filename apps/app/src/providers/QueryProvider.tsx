@@ -1,12 +1,11 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { QueryClient } from "@tanstack/react-query";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
-
 import { setupOnlineManager } from "@todo/query-toolkit";
+import { registerTaskMutationDefaults } from "@/features/tasks/registerMutationDefaults";
 
 const ONE_DAY_MS = 1000 * 60 * 60 * 24;
 
@@ -15,12 +14,16 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       staleTime: 1000 * 60,
-      // Must be >= the persister's maxAge below, or persisted queries
-      // get garbage-collected from memory before they're ever written to disk.
       gcTime: ONE_DAY_MS,
     },
   },
 });
+
+// Must run synchronously, at module scope, before the persister below has
+// any chance to finish restoring — resumePausedMutations() (in onSuccess,
+// further down) needs these defaults already registered or it has nothing
+// to call for mutations that were paused before the app was last killed.
+registerTaskMutationDefaults(queryClient);
 
 const persister = createAsyncStoragePersister({
   storage: AsyncStorage,
@@ -42,16 +45,15 @@ export function QueryProvider({ children }: Props) {
       persistOptions={{
         persister,
         maxAge: ONE_DAY_MS,
-        // Bump this if the cached shape of a query ever changes
-        // incompatibly (e.g. TasksPage gains a required field) —
-        // it invalidates old persisted caches instead of crashing on them.
-        buster: "v1",
+        buster: "v2",
+        dehydrateOptions: {
+          // Explicit rather than relying on the library default: only
+          // paused mutations get persisted, since an in-flight (not yet
+          // paused) mutation shouldn't survive a hard kill mid-request.
+          shouldDehydrateMutation: (mutation) => mutation.state.isPaused,
+        },
       }}
       onSuccess={() => {
-        // Paused mutations from earlier in this same app session (not
-        // ones from a prior, now-killed session — see Layer B note)
-        // resume automatically once the persisted cache finishes
-        // restoring and the QueryClient is ready.
         void queryClient.resumePausedMutations();
       }}
     >

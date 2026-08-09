@@ -2,6 +2,7 @@ import { useOptimisticListMutation } from "@todo/query-toolkit";
 
 import { updateTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
+import { TASK_MUTATION_KEYS } from "../constants/mutation-keys";
 import { useTasksStore } from "../stores/tasks-ui.store";
 import type { Task, TasksCursor, TasksPage, UpdateTask } from "../types/task";
 
@@ -16,6 +17,7 @@ export function useUpdateTask() {
   const { filter, sort } = useTasksStore();
 
   return useOptimisticListMutation<Task, TasksPage, TasksCursor | null, UpdateTaskInput>({
+    mutationKey: TASK_MUTATION_KEYS.update,
     queryKey: [...TASKS_QUERY_KEY, filter, sort],
     mutationFn: ({ id, updates }) => updateTask(id, updates),
     accessor,

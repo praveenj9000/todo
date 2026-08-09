@@ -1,4 +1,10 @@
-import { useMutation, useQueryClient, type QueryKey } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  type MutationKey,
+  type QueryClient,
+  type QueryKey,
+} from "@tanstack/react-query";
 
 import {
   cancelListQuery,
@@ -11,9 +17,9 @@ import {
 import type { EntityWithId, PageAccessor } from "./types";
 
 export type ListMutationConfig<TItem extends EntityWithId, TPage, TPageParam, TVariables> = {
+  mutationKey: MutationKey;
   queryKey: QueryKey;
   mutationFn: (variables: TVariables) => Promise<unknown>;
-  /** Given the current flattened item list and the mutation's variables, return the new item list — this is the only entity-specific piece. */
   updateItems: (items: TItem[], variables: TVariables) => TItem[];
   accessor: PageAccessor<TPage, TItem>;
   emptyPage: TPage;
@@ -29,6 +35,7 @@ export function useOptimisticListMutation<
   const queryClient = useQueryClient();
 
   return useMutation({
+    mutationKey: config.mutationKey,
     mutationFn: config.mutationFn,
 
     async onMutate(variables: TVariables) {
@@ -68,6 +75,34 @@ export function useOptimisticListMutation<
 
     onSettled() {
       invalidateList(queryClient, config.queryKey);
+    },
+  });
+}
+
+export type MutationDefaultsConfig<TVariables> = {
+  mutationKey: MutationKey;
+  mutationFn: (variables: TVariables) => Promise<unknown>;
+  /** Broad key prefix to invalidate once a resumed mutation settles, reconciling with server truth. No precise rollback is attempted here — see note above on why. */
+  invalidateKey: QueryKey;
+};
+
+/**
+ * Registers a mutation's implementation globally on the QueryClient, so it
+ * can be resumed after a full app restart — not just while the original
+ * component that called useMutation() is still mounted.
+ *
+ * Must be called synchronously, before the persisted client finishes
+ * rehydrating (e.g. right after creating the QueryClient, at module scope —
+ * not inside a React effect that could race with restoration).
+ */
+export function registerListMutationDefaults<TVariables>(
+  queryClient: QueryClient,
+  config: MutationDefaultsConfig<TVariables>,
+) {
+  queryClient.setMutationDefaults(config.mutationKey, {
+    mutationFn: config.mutationFn,
+    onSettled: () => {
+      invalidateList(queryClient, config.invalidateKey);
     },
   });
 }
