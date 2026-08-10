@@ -428,7 +428,9 @@ Accepted, deliberate limitations:
 - The task-move/reorder mutation is hand-written rather than built on the generic factory, because it branches on live UI state (which pagination mode and page the user is on) at call time. Registering a resumable default for it only covers the infinite-scroll cache path; a move made in paged mode does not get full optimistic re-application on resume after a restart (the read cache still reflects the pre-kill state via read persistence, so the user doesn't lose their view of the change — it just isn't replayed with the same optimistic-write fidelity).
 - Multi-device conflict resolution beyond last-write-wins is not implemented.
 
-Lesson learned while building this: input components that gate on a mutation's `isPending` (disable the field, clear it only after `await`) work fine online but break under `networkMode: "online"` while offline, since a paused mutation stays "pending" for the entire offline duration — not just a brief in-flight window. `AddTaskForm` originally did this; fixed by clearing input state synchronously on submit and using fire-and-forget `mutate` instead of `mutateAsync` + `await`, so multiple offline submissions can queue freely. Worth checking any future form built the same way (disable-while-pending, clear-after-await) against this same failure mode
+Lesson learned while building this: input components that gate on a mutation's `isPending` (disable the field, clear it only after `await`) work fine online but break under `networkMode: "online"` while offline, since a paused mutation stays "pending" for the entire offline duration — not just a brief in-flight window. `AddTaskForm` originally did this; fixed by clearing input state synchronously on submit and using fire-and-forget `mutate` instead of `mutateAsync` + `await`, so multiple offline submissions can queue freely. Worth checking any future form built the same way (disable-while-pending, clear-after-await) against this same failure mode.
+
+See `docs/testing-notes.md` for a running log of real regressions found during development (the paged-mode optimistic cache gap, the realtime replica-identity issue) that don't yet have dedicated test coverage — worth checking before assuming a new pagination mode, cache shape, or realtime-enabled table is safe by default.
 ---
 
 # Feature Lifecycle
@@ -484,4 +486,5 @@ Upcoming:
 - Google Sign-In
 - Apple Sign-In
 - Component/hook-level testing for apps/app (React Testing Library, mocked Supabase)
+- Includes closing the gaps tracked in docs/testing-notes.md
 - CD: automated builds/deploys via EAS (requires Expo account + EXPO_TOKEN secret)
