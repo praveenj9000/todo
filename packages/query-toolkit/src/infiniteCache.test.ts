@@ -45,7 +45,10 @@ describe("flattenInfiniteCache", () => {
       { items: [{ id: "3", label: "c" }], nextCursor: null },
     ]);
 
-    const result = flattenInfiniteCache(getInfiniteCache(client, queryKey), accessor);
+    const result = flattenInfiniteCache(
+      getInfiniteCache<Page, string | null>(client, queryKey),
+      accessor,
+    );
 
     expect(result.map((item) => item.id)).toEqual(["1", "2", "3"]);
   });
@@ -72,7 +75,10 @@ describe("flattenInfiniteCache", () => {
       },
     ]);
 
-    const result = flattenInfiniteCache(getInfiniteCache(client, queryKey), accessor);
+    const result = flattenInfiniteCache(
+      getInfiniteCache<Page, string | null>(client, queryKey),
+      accessor,
+    );
 
     expect(result.map((item) => item.id)).toEqual(["1", "2", "3"]);
   });
@@ -80,7 +86,10 @@ describe("flattenInfiniteCache", () => {
   it("returns an empty array when the cache is empty", () => {
     const client = makeClient();
 
-    const result = flattenInfiniteCache(getInfiniteCache(client, queryKey), accessor);
+    const result = flattenInfiniteCache(
+      getInfiniteCache<Page, string | null>(client, queryKey),
+      accessor,
+    );
 
     expect(result).toEqual([]);
   });
