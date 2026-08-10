@@ -6,7 +6,7 @@ This repository is the foundation for a production-ready cross-platform applicat
 
 The architecture is designed around independent features that own their own business logic, making new functionality easy to add, remove, and maintain without affecting the rest of the application.
 
-The long-term goal is to support multiple applications using the same architectural principles while keeping the codebase clean, scalable, and easy to understand. Several pieces of this repo — list rendering, pagination, drag-to-reorder, virtualization, optimistic cache management — were deliberately built as generic, reusable packages rather than task-specific code, so future projects (e.g. an e-commerce or admin product) can reuse them directly.
+The long-term goal is to support multiple applications using the same architectural principles while keeping the codebase clean, scalable, and easy to understand. Several pieces of this repo — list rendering, pagination, drag-to-reorder, virtualization, optimistic cache management, offline mutation queuing — were deliberately built as generic, reusable packages rather than task-specific code, so future projects (e.g. an e-commerce or admin product) can reuse them directly.
 
 ---
 
@@ -48,6 +48,7 @@ The long-term goal is to support multiple applications using the same architectu
   - `useQuery` / `useInfiniteQuery` for reads
   - Optimistic mutations via `@todo/query-toolkit`
   - Persisted query cache (offline read support)
+  - Persisted, restart-resumable mutation queue for simple CRUD mutations (see Offline Support)
   - `onlineManager` wired to real device connectivity (`NetInfo` on native, browser events on web)
 
 ## Client State
@@ -132,6 +133,7 @@ tasks/
     screens/
     stores/
     types/
+    registerMutationDefaults.ts
     index.ts
 
 settings/
@@ -141,7 +143,7 @@ settings/
     index.ts
 ```
 
-A feature should contain everything related to that feature — including its own optimistic-mutation hooks, built on top of the generic primitives in `@todo/query-toolkit`, not by hand-rolling cache logic per feature.
+A feature should contain everything related to that feature — including its own optimistic-mutation hooks, built on top of the generic primitives in `@todo/query-toolkit`, not by hand-rolling cache logic per feature. A feature that wants its simple CRUD mutations to survive an app restart while offline also owns a `registerMutationDefaults.ts` (or similarly named) file — see Offline Support.
 
 Typical contents include:
 
@@ -199,7 +201,7 @@ Responsible for:
 - Feature API
 - Feature providers
 
-Each feature should be independently maintainable. A feature composes generic packages (`@todo/ui`, `@todo/query-toolkit`, `@todo/design-system`) rather than reimplementing list rendering, pagination, or optimistic-cache logic itself.
+Each feature should be independently maintainable. A feature composes generic packages (`@todo/ui`, `@todo/query-toolkit`, `@todo/design-system`) rather than reimplementing list rendering, pagination, optimistic-cache logic, or mutation-resumability itself.
 
 ---
 
@@ -210,7 +212,7 @@ Responsible for global application providers.
 Current:
 
 - AppProvider
-- QueryProvider (also wires query cache persistence and the online/offline connectivity manager)
+- QueryProvider — wires query cache persistence, the online/offline connectivity manager, and calls each feature's mutation-defaults registration (e.g. `registerTaskMutationDefaults`) synchronously at module scope, before the persisted cache finishes rehydrating
 
 Future examples:
 
@@ -247,7 +249,7 @@ Current packages:
 - auth
 - design-system — Tamagui-based components, including shared `EmptyState` / `ErrorState` / `Loading`
 - env
-- query-toolkit — generic, non-visual optimistic-cache and infinite/paged-cache helpers for TanStack Query, plus the online-manager connectivity setup. No dependency on any entity type or UI framework.
+- query-toolkit — generic, non-visual optimistic-cache and infinite/paged-cache helpers for TanStack Query, the online-manager connectivity setup, and `registerListMutationDefaults` for restart-resumable offline mutations. No dependency on any entity type or UI framework.
 - styling
 - supabase
 - types
@@ -271,7 +273,7 @@ Feature Screen
 Feature Components  ───►  @todo/ui (List / SortableList / AsyncList)
       │
       ▼
-Feature Hooks  ───►  @todo/query-toolkit (optimistic cache helpers)
+Feature Hooks  ───►  @todo/query-toolkit (optimistic cache + mutation-resumability helpers)
       │
       ▼
 Feature API
@@ -285,7 +287,7 @@ Global providers:
 ```text
 App
  │
- ├── Query Provider (cache persistence, online manager)
+ ├── Query Provider (cache persistence, online manager, mutation-defaults registration)
  ├── Auth Provider
  └── Design System
 ```
@@ -310,7 +312,7 @@ A feature should not depend on another feature's internal files.
 
 Communication between features should happen only through public APIs.
 
-A feature's mutation hooks should be built on `@todo/query-toolkit`'s generic optimistic-mutation helpers rather than duplicating cache read/write/rollback logic per feature.
+A feature's mutation hooks should be built on `@todo/query-toolkit`'s generic optimistic-mutation helpers rather than duplicating cache read/write/rollback logic per feature. Simple CRUD mutations (create/update/delete) should register a `mutationKey` and call `registerListMutationDefaults` so they can resume after an app restart while offline; mutations that depend on live, ephemeral UI state at call time (e.g. a reorder mutation branching on which pagination mode is active) may not be able to fully support this — see Offline Support for the accepted limitation.
 
 ---
 
@@ -331,7 +333,7 @@ Used for:
 - Server state
 - Remote caching (persisted to disk for offline read access)
 - Background refetching
-- Optimistic mutations, paused automatically while offline and resumed on reconnect
+- Optimistic mutations, paused automatically while offline and resumed on reconnect within the same app session, and — for mutations registered via `registerListMutationDefaults` — resumable even after a full app restart
 - Cache invalidation
 
 ### Zustand
@@ -356,7 +358,7 @@ Feature Hook (useXPaged / useXInfinite / useCreateX / ...)
     │
     ▼
 TanStack Query  ◄──►  Persisted cache (offline reads)
-    │
+    │                 Persisted mutation queue (offline writes, restart-resumable)
     ▼
 Feature API
     │
@@ -416,13 +418,16 @@ Future providers:
 Current scope:
 
 - **Reads** — the TanStack Query cache is persisted to disk (`AsyncStorage`/`localStorage`) and rehydrated on launch, so the app opens with last-known data even without a network connection.
-- **Writes** — mutations use TanStack Query's default network handling: optimistic updates apply instantly regardless of connectivity, and the underlying network call is paused while offline and resumed automatically, in order, once connectivity returns (verified via a real connectivity signal, not just an assumed online state). This covers offline mutations made and resolved within the same app session.
+- **Writes, same session** — mutations use TanStack Query's default network handling: optimistic updates apply instantly regardless of connectivity, and the underlying network call is paused while offline and resumed automatically, in order, once connectivity returns (verified via a real connectivity signal, not just an assumed online state).
+- **Writes, across app restarts** — simple CRUD mutations (create/update/delete) register their implementation globally on the `QueryClient` via `registerListMutationDefaults`, keyed by a stable `mutationKey`, rather than only existing as a per-hook closure. This lets `resumePausedMutations()` replay a mutation that was queued and paused before the app was killed, once it restarts and reconnects — not just while the original component stays mounted. Verified end-to-end on web (offline create/move, tab close, reopen, reconnect, confirmed server-side)
 
-Not yet covered (open follow-up):
+Accepted, deliberate limitations:
 
-- Mutations queued while offline **do not currently survive a full app kill/restart** before reconnecting — persisting and resuming the mutation queue itself (not just the read cache) requires registering mutation functions centrally on the `QueryClient` rather than as per-hook closures, which is a deliberate follow-up scope, not an oversight.
+- A resumed mutation's failure path cannot restore the exact prior optimistic snapshot (that rollback context isn't serializable) — on failure, the cache is reconciled by invalidating and refetching real server state instead of a precise rollback.
+- The task-move/reorder mutation is hand-written rather than built on the generic factory, because it branches on live UI state (which pagination mode and page the user is on) at call time. Registering a resumable default for it only covers the infinite-scroll cache path; a move made in paged mode does not get full optimistic re-application on resume after a restart (the read cache still reflects the pre-kill state via read persistence, so the user doesn't lose their view of the change — it just isn't replayed with the same optimistic-write fidelity).
 - Multi-device conflict resolution beyond last-write-wins is not implemented.
 
+Lesson learned while building this: input components that gate on a mutation's `isPending` (disable the field, clear it only after `await`) work fine online but break under `networkMode: "online"` while offline, since a paused mutation stays "pending" for the entire offline duration — not just a brief in-flight window. `AddTaskForm` originally did this; fixed by clearing input state synchronously on submit and using fire-and-forget `mutate` instead of `mutateAsync` + `await`, so multiple offline submissions can queue freely. Worth checking any future form built the same way (disable-while-pending, clear-after-await) against this same failure mode
 ---
 
 # Feature Lifecycle
@@ -432,8 +437,9 @@ When creating a new feature:
 1. Create a folder under `src/features`.
 2. Add only the folders the feature actually needs.
 3. Keep all business logic inside the feature; build list UI on `@todo/ui` and mutation hooks on `@todo/query-toolkit` rather than reimplementing either.
-4. Export the feature's public API through `index.ts`.
-5. Keep route files as thin wrappers.
+4. If the feature has simple CRUD mutations that should survive an offline app restart, define mutation keys and a `register<Feature>MutationDefaults` function calling `@todo/query-toolkit`'s `registerListMutationDefaults`, and call it from `QueryProvider` at module scope.
+5. Export the feature's public API through `index.ts`.
+6. Keep route files as thin wrappers.
 
 Removing a feature should primarily involve deleting its folder and removing its routes.
 
@@ -468,12 +474,13 @@ Completed:
 - Offline read support (persisted query cache) and same-session offline mutation retry on reconnect
 - Unit tests for @todo/query-toolkit and @todo/ui pagination logic
 - CI: automated formatting, typecheck, and test checks on every push/PR
+- Restart-resumable offline mutation queue for simple CRUD (implemented and verified end-to-end)
 
 Upcoming:
 
-- Offline mutation queue surviving app restarts (persisted, resumable mutations)
+- Extend the restart-resumable mutation pattern to any future entity beyond tasks
 - Realtime synchronization
-- Multi-device conflict resolution
+- Multi-device conflict resolution (including concurrent reorder across devices)
 - Google Sign-In
 - Apple Sign-In
 - Component/hook-level testing for apps/app (React Testing Library, mocked Supabase)
