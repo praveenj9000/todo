@@ -50,6 +50,7 @@ The long-term goal is to support multiple applications using the same architectu
   - Persisted query cache (offline read support)
   - Persisted, restart-resumable mutation queue for simple CRUD mutations (see Offline Support)
   - `onlineManager` wired to real device connectivity (`NetInfo` on native, browser events on web)
+  - Requires `replica identity full` on any realtime-enabled table when filtering by a non-primary-key column (e.g. `user_id`) — otherwise DELETE/UPDATE events omit that column from the replicated payload and the filter silently drops the event for every subscriber, including the originating client's other sessions.
 
 ## Client State
 
@@ -479,7 +480,6 @@ Completed:
 Upcoming:
 
 - Extend the restart-resumable mutation pattern to any future entity beyond tasks
-- Realtime synchronization
 - Multi-device conflict resolution (including concurrent reorder across devices)
 - Google Sign-In
 - Apple Sign-In

@@ -1,0 +1,1 @@
+alter table public.tasks replica identity full;
