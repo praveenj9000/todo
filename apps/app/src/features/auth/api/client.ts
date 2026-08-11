@@ -13,3 +13,5 @@ export function register(email: string, password: string) {
 export function logout() {
   return signOut(supabase);
 }
+
+export { supabase };
