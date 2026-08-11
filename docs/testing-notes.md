@@ -109,3 +109,48 @@ second passive observer — not just the mode currently active in
 As of this pass, also covered: `TaskFilters`, `TaskRow`, `TaskItem` (non-draggable path, `@todo/ui/sortable` mocked out), `LoginForm`, `RegisterForm`, plus `useUpdateTask`/`useDeleteTask` paged-cache regressions. `TaskList` remains untested for the same reason as the list primitives — it directly composes `AsyncList`/`List`, which branch into `SortableList` or `VirtualizedList` depending on config.
 
 **When to revisit:** if this template gets reused for a project where list/drag correctness is high-stakes enough to justify a Playwright-based test setup, or if a regression in these components actually occurs and needs a guarding test written retroactively.
+
+---
+
+## 4. End-to-End (E2E) testing — deferred, not yet started
+
+**What this is:** true end-to-end/UI testing — driving the actual running
+app the way a real user would (open the app, tap "Add", type a title, tap
+"Delete", etc.) — as opposed to the unit/component tests that exist today,
+which test pieces in isolation with dependencies mocked.
+
+**Status:** intentionally deferred until the app is more mature. Revisit this
+section when picking it back up, rather than re-deciding from scratch.
+
+**Scope, once started:** both platforms —
+
+- **Web** — [Playwright](https://playwright.dev). Drives a real browser
+  (Chromium/WebKit/Firefox), standard choice for Expo web builds.
+- **Native (iOS/Android)** — [Maestro](https://maestro.mobile.dev) is the
+  likely pick over Detox: simpler YAML-based flows, drives a built app via
+  accessibility identifiers without needing Detox's deeper native-build
+  integration. Detox remains an option if finer-grained control ends up
+  necessary.
+
+**Open decision, not yet made:** whether E2E tests hit a real Supabase test
+project (separate from production, seeded/reset per run) or a mocked/local
+backend. Tradeoffs to weigh when this is picked up:
+
+- _Real test project_ — catches real integration issues (RLS policies, the
+  `move_task` RPC, Realtime delivery, replica identity behavior) that a mock
+  can't; costs actual Supabase infrastructure and needs a seed/reset strategy
+  between test runs so tests don't interfere with each other.
+- _Mocked backend_ — fast, no external dependency, but doesn't exercise any
+  of the real backend logic — several of the bugs already caught this session
+  (paged-cache mismatch, replica identity) were backend-integration issues a
+  mock would never have surfaced.
+- A hybrid (mocked for most flows, a smaller real-backend suite for
+  RLS/RPC/Realtime-specific paths) is also worth considering rather than
+  picking one exclusively.
+
+**Why not now:** E2E tests are slow and need real infrastructure (a test
+backend, simulators/emulators for native) — they don't fit into the existing
+pre-commit hook (`format` → `typecheck` → `test`) the way the current Vitest
+suite does. The standard pattern is running E2E in CI only (on PR or on a
+schedule), not on every local commit — this repo's CI/E2E split isn't set up
+yet either, and would need to be part of this work when it starts.

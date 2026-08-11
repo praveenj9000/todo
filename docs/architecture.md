@@ -511,7 +511,8 @@ Upcoming:
 - Google Sign-In
 - Apple Sign-In
 - Component/hook-level testing for apps/app (React Testing Library, mocked Supabase)
-  - Includes closing the gaps tracked in docs/testing-notes.md
+- Includes closing the gaps tracked in docs/testing-notes.md
+- End-to-end UI testing (Playwright for web, Maestro for native) — deferred until the app is more mature; see docs/testing-notes.md for scope and the open backend-strategy decision
 - CD: automated builds/deploys via EAS (requires Expo account + EXPO_TOKEN secret)
 
 Intentionally out of scope:
