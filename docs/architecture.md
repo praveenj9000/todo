@@ -503,6 +503,7 @@ Completed:
 - Restart-resumable offline mutation queue for simple CRUD (implemented and verified end-to-end)
 - Realtime sync for live task list updates across devices/tabs (insert/update/delete)
 - Unit tests for @todo/query-toolkit and @todo/ui pagination logic
+- Component/hook-level tests for apps/app: AddTaskForm, TaskFilters, TaskRow, TaskItem, LoginForm, RegisterForm, and paged-cache mutation regressions
 - CI: automated formatting, typecheck, and test checks on every push/PR
 
 Upcoming:
@@ -510,9 +511,9 @@ Upcoming:
 - Extend the restart-resumable mutation pattern to any future entity beyond tasks
 - Google Sign-In
 - Apple Sign-In
-- Component/hook-level testing for apps/app (React Testing Library, mocked Supabase)
 - Includes closing the gaps tracked in docs/testing-notes.md
 - End-to-end UI testing (Playwright for web, Maestro for native) — deferred until the app is more mature; see docs/testing-notes.md for scope and the open backend-strategy decision
+- Component/hook-level tests for apps/app: AddTaskForm, TaskFilters, TaskRow, TaskItem, LoginForm, RegisterForm, and paged-cache mutation regressions
 - CD: automated builds/deploys via EAS (requires Expo account + EXPO_TOKEN secret)
 
 Intentionally out of scope:
