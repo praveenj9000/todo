@@ -43,12 +43,19 @@
     "@tamagui/babel-plugin": "^2.6.2",
     "@types/react": "~19.2.2",
     "babel-preset-expo": "^57.0.5",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vitest": "^3.2.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/user-event": "^14.5.2"
   },
   "scripts": {
     "dev": "expo start",
     "build": "expo export",
     "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",

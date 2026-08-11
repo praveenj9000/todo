@@ -239,11 +239,15 @@ pnpm dlx supabase --version
 pnpm test
 ```
 
-Runs Vitest across every workspace package that has a `test` script, via Turborepo.
+Runs Vitest across every workspace package that has a `test` script, via Turborepo. A pre-commit hook runs formatting, typecheck, and the full test suite automatically before every commit — Turborepo's cache keeps repeat runs fast.
 
-Currently covered: `@todo/query-toolkit` (optimistic cache logic) and `@todo/ui`'s pagination math (`getPageNumbers`). These are pure-logic tests with no DOM or Supabase mocking required — the highest-risk, most reused code in the repo, tested first.
+Currently covered:
 
-Component and hook-level testing for `apps/app` (React Testing Library, mocked Supabase client) is a planned follow-up, not yet in place.
+- `@todo/query-toolkit` — optimistic cache logic (pure, no DOM)
+- `@todo/ui` — pagination math (`getPageNumbers`, pure, no DOM)
+- `apps/app` — `AddTaskForm` component behavior (jsdom + React Testing Library), `useCreateTask`'s paged-mode optimistic cache write (renderHook, mocked API layer, real cache logic)
+
+**Not yet covered:** `SortableList`, `List`, `AsyncList` — these depend on `react-native-draggable-flatlist`, `@dnd-kit`, and `@tanstack/react-virtual`, which need real browser layout APIs jsdom doesn't reliably provide. Testing these needs either a real browser test runner (Playwright component testing) or heavier jsdom polyfilling (`ResizeObserver`, pointer events) — deliberately deferred rather than faked with a brittle jsdom shim. See `docs/testing-notes.md`.
 
 ## Continuous Integration
 

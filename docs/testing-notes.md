@@ -37,6 +37,9 @@ whichever cache is actually active.
   mutation hook with `FEATURES.infiniteScroll.enabled = false`, fires the
   mutation, and asserts the _paged_ query key's cache — not the scroll one —
   reflects the optimistic change.
+- ✅ Added: `apps/app/src/features/tasks/hooks/useCreateTask.test.tsx` asserts the paged-mode cache is written to directly (not the infinite-scroll cache) when `FEATURES` is in paged mode.
+- ✅ Added: equivalent tests for `useUpdateTask`/`useDeleteTask`.
+- Not yet added: the inverse case (`infiniteScroll.enabled = true`) asserting the scroll cache updates and the paged cache is untouched.
 - Repeat with `infiniteScroll.enabled = true` asserting the scroll cache
   updates and the paged cache is untouched.
 - `packages/query-toolkit`'s existing `pagedCache.test.ts` already covers the
@@ -94,3 +97,15 @@ pagination modes, cache shapes, or realtime-enabled tables in the future,
 explicitly test the _non-default_ mode/configuration and, where relevant, a
 second passive observer — not just the mode currently active in
 `config/features.ts`.
+
+---
+
+## 3. `SortableList` / `List` / `AsyncList` have no test coverage
+
+**Why:** these components depend on `react-native-draggable-flatlist`, `@dnd-kit/*`, and `@tanstack/react-virtual` — all of which expect real browser layout and pointer-event APIs (`ResizeObserver`, `getBoundingClientRect`, pointer capture) that jsdom does not implement reliably. Testing them meaningfully needs either a real-browser test runner (e.g. Playwright component testing) or substantial jsdom polyfilling, which risks producing tests that pass without actually exercising real drag/virtualization behavior.
+
+**Status:** deliberately deferred, not overlooked. `AddTaskForm` and `useCreateTask`'s cache logic are covered as of the `apps/app` testing setup; the list primitives are not.
+
+As of this pass, also covered: `TaskFilters`, `TaskRow`, `TaskItem` (non-draggable path, `@todo/ui/sortable` mocked out), `LoginForm`, `RegisterForm`, plus `useUpdateTask`/`useDeleteTask` paged-cache regressions. `TaskList` remains untested for the same reason as the list primitives — it directly composes `AsyncList`/`List`, which branch into `SortableList` or `VirtualizedList` depending on config.
+
+**When to revisit:** if this template gets reused for a project where list/drag correctness is high-stakes enough to justify a Playwright-based test setup, or if a regression in these components actually occurs and needs a guarding test written retroactively.
