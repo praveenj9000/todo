@@ -39,7 +39,7 @@ whichever cache is actually active.
   reflects the optimistic change.
 - ✅ Added: `apps/app/src/features/tasks/hooks/useCreateTask.test.tsx` asserts the paged-mode cache is written to directly (not the infinite-scroll cache) when `FEATURES` is in paged mode.
 - ✅ Added: equivalent tests for `useUpdateTask`/`useDeleteTask`.
-- Not yet added: the inverse case (`infiniteScroll.enabled = true`) asserting the scroll cache updates and the paged cache is untouched.
+- ✅ Added: inverse-mode tests (`*.infiniteScroll.test.tsx`) for create/update/delete, mocking `@/config/features` to force the scroll-mode branch, asserting the scroll cache updates and the paged cache stays untouched.
 - Repeat with `infiniteScroll.enabled = true` asserting the scroll cache
   updates and the paged cache is untouched.
 - `packages/query-toolkit`'s existing `pagedCache.test.ts` already covers the

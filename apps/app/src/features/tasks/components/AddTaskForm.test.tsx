@@ -20,7 +20,7 @@ describe("AddTaskForm", () => {
   });
 
   it("clears the input immediately on submit, without waiting for the mutation", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
 
     renderWithProviders(<AddTaskForm />);
 
@@ -39,7 +39,7 @@ describe("AddTaskForm", () => {
   });
 
   it("does not call the mutation for an empty or whitespace-only title", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
 
     renderWithProviders(<AddTaskForm />);
 
@@ -54,7 +54,7 @@ describe("AddTaskForm", () => {
   });
 
   it("remains editable across multiple submissions (not permanently disabled)", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
 
     renderWithProviders(<AddTaskForm />);
 

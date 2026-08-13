@@ -14,7 +14,7 @@ vi.mock("../api/client", () => ({
 
 describe("RegisterForm", () => {
   it("calls register with the entered email and password", async () => {
-    const user = userEvent.setup();
+    const user = userEvent.setup({ delay: null });
     registerMock.mockResolvedValue({ error: null });
 
     renderWithProviders(<RegisterForm />);

@@ -10,6 +10,13 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     clearMocks: true,
+    testTimeout: 15000,
+    pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
     env: {
       EXPO_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co",
       EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "placeholder-key",
