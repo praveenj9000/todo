@@ -41,3 +41,19 @@ export type TasksOffsetPage = {
   tasks: Task[];
   totalCount: number;
 };
+
+export type TaskRelation = "origin" | "sibling" | "child";
+
+export type RelatedTask = {
+  task: Task;
+  /** Distance from the true root of the tree — 0 for the root itself, 1 for its direct children, etc. Shared by every task at the same level, not just the viewed task's ancestors. */
+  depth: number;
+  /** True if this task is a direct ancestor of the task being viewed (i.e. on the path from the viewed task up to the root). */
+  isAncestor: boolean;
+};
+
+export type RelatedTaskTree = {
+  items: RelatedTask[];
+  /** The true root task of the tree (depth 0) — used as the scroll target for the in-panel "jump to root 0" button. Null if the viewed task has no links at all. */
+  root0TaskId: string | null;
+};

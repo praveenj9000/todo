@@ -3,6 +3,8 @@ import type { ReactElement } from "react";
 import { render } from "@testing-library/react";
 import { DesignSystemProvider } from "@todo/design-system";
 
+import { TaskScrollProvider } from "@/features/tasks/context/TaskScrollContext";
+
 import { createTestQueryClient, TestQueryProvider } from "./queryClientWrapper";
 
 export function renderWithProviders(ui: ReactElement) {
@@ -11,7 +13,9 @@ export function renderWithProviders(ui: ReactElement) {
   function wrap(element: ReactElement) {
     return (
       <DesignSystemProvider>
-        <TestQueryProvider client={client}>{element}</TestQueryProvider>
+        <TestQueryProvider client={client}>
+          <TaskScrollProvider>{element}</TaskScrollProvider>
+        </TestQueryProvider>
       </DesignSystemProvider>
     );
   }

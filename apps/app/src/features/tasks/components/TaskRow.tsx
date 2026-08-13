@@ -1,8 +1,13 @@
+import { useState } from "react";
 import type { ComponentType, PropsWithChildren } from "react";
 
-import { Button, Text, XStack } from "tamagui";
+import { Button, Text, XStack, YStack } from "tamagui";
 
 import type { Task } from "../types/task";
+import { LinkedTasksPanel } from "./LinkedTasksPanel";
+import { useTaskOrigin } from "../hooks/useTaskOrigin";
+import { useJumpToTask } from "../hooks/useJumpToTask";
+import { useTaskScroll } from "../context/TaskScrollContext";
 
 type DragHandleComponent = ComponentType<PropsWithChildren>;
 
@@ -14,25 +19,56 @@ type Props = {
 };
 
 export function TaskRow({ task, onToggleCompleted, onDelete, DragHandle }: Props) {
+  const [expanded, setExpanded] = useState(false);
+
+  const { data: origin } = useTaskOrigin(task.id);
+  const { registerRow } = useTaskScroll();
+
   return (
-    <XStack padding="$4" gap="$3" alignItems="center">
-      {DragHandle ? (
-        <DragHandle>
-          <Button chromeless size="$3">
-            ☰
-          </Button>
-        </DragHandle>
-      ) : null}
+    <YStack ref={(node) => registerRow(task.id, node as unknown as HTMLElement | null)}>
+      <XStack padding="$4" gap="$3" alignItems="center">
+        {origin ? <JumpToOriginButton originId={origin.id} /> : null}
 
-      <Button size="$3" onPress={onToggleCompleted}>
-        {task.completed ? "✓" : "○"}
-      </Button>
+        {DragHandle ? (
+          <DragHandle>
+            <Button chromeless size="$3">
+              ☰
+            </Button>
+          </DragHandle>
+        ) : null}
 
-      <Text flex={1}>{task.title}</Text>
+        <Button size="$3" onPress={onToggleCompleted}>
+          {task.completed ? "✓" : "○"}
+        </Button>
 
-      <Button size="$3" theme="red" onPress={onDelete}>
-        Delete
-      </Button>
-    </XStack>
+        <Text flex={1}>{task.title}</Text>
+
+        <Button chromeless size="$3" onPress={() => setExpanded((prev) => !prev)}>
+          {expanded ? "▾" : "▸"}
+        </Button>
+
+        <Button size="$3" theme="red" onPress={onDelete}>
+          Delete
+        </Button>
+      </XStack>
+
+      {expanded ? <LinkedTasksPanel taskId={task.id} /> : null}
+    </YStack>
+  );
+}
+
+function JumpToOriginButton({ originId }: { originId: string }) {
+  const { jumpToTask, status } = useJumpToTask();
+
+  return (
+    <Button
+      chromeless
+      size="$2"
+      onPress={() => jumpToTask(originId)}
+      disabled={status === "jumping"}
+      aria-label="Jump to origin task"
+    >
+      ↩
+    </Button>
   );
 }

@@ -10,11 +10,20 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     clearMocks: true,
+    env: {
+      EXPO_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co",
+      EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "placeholder-key",
+    },
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
       "react-native$": "react-native-web",
+      "@react-native-async-storage/async-storage": path.resolve(
+        __dirname,
+        "src/test/mocks/asyncStorage.ts",
+      ),
+      "react-native-url-polyfill/auto": path.resolve(__dirname, "src/test/mocks/urlPolyfill.ts"),
     },
     // Vite has no built-in concept of Metro's .native/.web platform
     // extensions — this list makes it check .web.ts(x) before the

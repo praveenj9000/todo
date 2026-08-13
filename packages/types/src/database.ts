@@ -39,6 +39,55 @@ export type Database = {
   }
   public: {
     Tables: {
+      task_links: {
+        Row: {
+          created_at: string
+          created_from_task_id: string | null
+          id: string
+          task_id_a: string
+          task_id_b: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_from_task_id?: string | null
+          id?: string
+          task_id_a: string
+          task_id_b: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_from_task_id?: string | null
+          id?: string
+          task_id_a?: string
+          task_id_b?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_links_created_from_task_id_fkey"
+            columns: ["created_from_task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_links_task_id_a_fkey"
+            columns: ["task_id_a"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "task_links_task_id_b_fkey"
+            columns: ["task_id_b"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tasks: {
         Row: {
           completed: boolean
@@ -77,6 +126,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_linked_task: {
+        Args: { p_source_task_id: string; p_title: string }
+        Returns: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "tasks"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      get_connected_task_ids: { Args: { p_task_id: string }; Returns: string[] }
       move_task: {
         Args: { p_next_id?: string; p_prev_id?: string; p_task_id: string }
         Returns: {
