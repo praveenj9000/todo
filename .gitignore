@@ -18,6 +18,7 @@ web-build/
 apps/app/.env
 # Do not ignore .env.example
 !.env.example
+!.env.e2e.example
 
 # OS
 .DS_Store

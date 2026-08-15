@@ -119,10 +119,14 @@ app the way a real user would (open the app, tap "Add", type a title, tap
 "Delete", etc.) — as opposed to the unit/component tests that exist today,
 which test pieces in isolation with dependencies mocked.
 
-**Status:** intentionally deferred until the app is more mature. Revisit this
-section when picking it back up, rather than re-deciding from scratch.
+**Status:** started, web-only. Native (Maestro) still deferred until it's actually added to the app.
 
-**Scope, once started:** both platforms —
+**Scope, current:** web only, via Playwright, against a real dedicated
+Supabase test project (not mocked) — chosen because this app's actual bugs
+so far (paged-cache mismatch, realtime replica-identity) were backend-
+integration issues a mock can't surface. Scope is deliberately narrow: a
+handful of smoke specs (login, task CRUD, task linking), not a mirror of
+the unit/component suite.
 
 - **Web** — [Playwright](https://playwright.dev). Drives a real browser
   (Chromium/WebKit/Firefox), standard choice for Expo web builds.
@@ -132,9 +136,26 @@ section when picking it back up, rather than re-deciding from scratch.
   integration. Detox remains an option if finer-grained control ends up
   necessary.
 
-**Open decision, not yet made:** whether E2E tests hit a real Supabase test
-project (separate from production, seeded/reset per run) or a mocked/local
-backend. Tradeoffs to weigh when this is picked up:
+**Setup required (outside this repo, per-developer):**
+
+- A separate Supabase project used only for E2E, migrated identically to
+  prod but never touching real data.
+- One fixed test user in that project.
+- A local `.env.e2e` in the repo root (gitignored) with that project's
+  URL/key, the test user's credentials, and its project ref
+  (`E2E_PROJECT_REF`) — see `docs/setup.md` for the full one-time setup.
+- `pnpm db:push:e2e` applies the current migration history to the E2E
+  project (run once at setup, and again any time a new migration is
+  added — see `docs/supabase.md`).
+- `pnpm test:e2e` runs the suite locally.
+
+**Known gap:** the locators in `apps/app/e2e/*.spec.ts` were written
+without running against the live app yet — Tamagui's rendered DOM
+structure needs confirming and locators adjusted after the first real run.
+Don't trust these specs as verified until that's done.
+
+**Native (Maestro):** still fully deferred — add when native support
+actually lands in the app, not before.
 
 - _Real test project_ — catches real integration issues (RLS policies, the
   `move_task` RPC, Realtime delivery, replica identity behavior) that a mock

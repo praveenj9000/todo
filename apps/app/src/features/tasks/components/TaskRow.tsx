@@ -25,7 +25,10 @@ export function TaskRow({ task, onToggleCompleted, onDelete, DragHandle }: Props
   const { registerRow } = useTaskScroll();
 
   return (
-    <YStack ref={(node) => registerRow(task.id, node as unknown as HTMLElement | null)}>
+    <YStack
+      ref={(node) => registerRow(task.id, node as unknown as HTMLElement | null)}
+      testID={`task-row-${task.id}`}
+    >
       <XStack padding="$4" gap="$3" alignItems="center">
         {origin ? <JumpToOriginButton originId={origin.id} /> : null}
 

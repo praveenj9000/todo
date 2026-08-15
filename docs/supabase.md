@@ -46,7 +46,7 @@ A new SQL migration will be created inside:
 supabase/migrations/
 ```
 
-> **Note:** Pass only the name — do not include a `.sql` extension. `supabase migration new` appends `.sql` automatically; including it yourself produces a file ending in `.sql.sql`.
+> **Note:** Pass only the name — do not include a `.sql` extension. `pnpm db:new` strips a trailing `.sql` automatically if you include one and validates the name before creating the file, so this can't produce a `.sql.sql` file even by mistake.
 
 ## 2. Edit the Migration
 
@@ -70,7 +70,7 @@ Never edit previously applied migration files.
 pnpm db:push
 ```
 
-This applies every pending migration to the linked Supabase project.
+This applies every pending migration to the linked Supabase project (the one currently linked — see `pnpm db:link:prod` / `pnpm db:link:e2e` below if you're working with more than one project).
 
 ## 4. Verify the Migration Applied
 
@@ -100,7 +100,15 @@ packages/types/src/database.ts
 
 The generated file should never be edited manually.
 
-## 6. Commit
+## 6. Apply the Same Migration to the E2E Project
+
+If this repo has an E2E test database set up (see below), apply the same migration there too — otherwise the two schemas drift apart and E2E tests may pass or fail against outdated assumptions:
+
+```bash
+pnpm db:push:e2e
+```
+
+## 7. Commit
 
 Commit the migration together with the generated database types.
 
@@ -181,11 +189,14 @@ No additional setup is required.
 | `pnpm db:login`           | Authenticate the Supabase CLI.                                                                                                                           |
 | `pnpm db:link`            | Link the repository to a Supabase project.                                                                                                               |
 | `pnpm db:new <name>`      | Create a new migration. Automatically strips a trailing `.sql` if you include one, and validates the name.                                               |
-| `pnpm db:push`            | Apply pending migrations.                                                                                                                                |
+| `pnpm db:push`            | Apply pending migrations to whichever project is currently linked.                                                                                       |
 | `pnpm db:pull`            | Pull the remote schema into local migrations (rarely needed).                                                                                            |
 | `pnpm db:types`           | Generate TypeScript database types.                                                                                                                      |
 | `pnpm db:reset`           | Reset the linked database. See Supabase CLI docs for local-dev usage (`supabase start`), which is not otherwise part of this repo's documented workflow. |
 | `supabase migration list` | Compare local migration files against what's applied remotely.                                                                                           |
+| `pnpm db:link:prod`       | Link the CLI to the main project (reads `PROD_PROJECT_REF` from `.env`).                                                                                 |
+| `pnpm db:link:e2e`        | Link the CLI to the E2E project (reads `E2E_PROJECT_REF` from `.env.e2e`).                                                                               |
+| `pnpm db:push:e2e`        | Push and verify pending migrations against the E2E project, then relink to prod automatically.                                                           |
 
 ---
 
@@ -196,8 +207,46 @@ No additional setup is required.
 - Never modify an applied migration.
 - After `db:push`, verify the migration actually applied — don't rely on the command's success alone.
 - Generate database types after every migration.
+- If an E2E test database exists (see below), apply every new migration there too, via `pnpm db:push:e2e` — don't let it silently drift from the main project's schema.
 - Commit migrations and generated types together.
 - Avoid making schema changes directly in the Supabase Dashboard.
 - Keep all schema history in Git.
 
 Following these practices ensures every developer can recreate the database from the repository alone.
+
+---
+
+# E2E Test Database
+
+A separate Supabase project (`todo-e2e`) mirrors the schema of the main
+project, used only by the Playwright E2E suite — never touches production
+data. See `docs/setup.md`'s "E2E Testing Setup" section for one-time
+project creation and `.env.e2e` configuration.
+
+## Applying a New Migration to Both Projects
+
+Every migration must be applied to the main project **and** the E2E
+project, so they don't drift apart. After the normal migration workflow
+above (`pnpm db:push` against the main project):
+
+```bash
+pnpm db:push:e2e
+```
+
+This links to the E2E project, pushes pending migrations, verifies them,
+and relinks back to the main project automatically — including on failure,
+so the CLI is never left pointed at the wrong project by accident.
+
+If a step fails, the script prints the four underlying commands to run
+manually for debugging:
+
+```bash
+pnpm db:link:e2e
+pnpm dlx supabase db push
+pnpm verify-migration
+pnpm db:link:prod
+```
+
+## Related Commands
+
+See the Useful Commands table above — `db:link:prod`, `db:link:e2e`, and `db:push:e2e` are listed there alongside the rest of the CLI commands, rather than duplicated in a second table here.

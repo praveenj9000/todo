@@ -27,6 +27,10 @@
     "db:reset": "pnpm dlx supabase db reset",
     "db:types": "pnpm dlx supabase gen types typescript --linked > packages/types/src/database.ts",
     "db:new": "pnpm dlx supabase migration new",
+    "db:link:prod": "node scripts/db-link.mjs prod",
+    "db:link:e2e": "node scripts/db-link.mjs e2e",
+    "db:push:e2e": "node scripts/db-push-e2e.mjs",
+    "test:e2e": "pnpm --filter @todo/app test:e2e",
     "prepare": "husky"
   },
   "devDependencies": {

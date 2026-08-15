@@ -145,6 +145,63 @@ Checks formatting without writing changes — useful in CI.
 
 A pre-commit hook (via Husky + lint-staged) automatically formats staged files with Prettier before each commit — no manual `pnpm format` step needed. If a file gets reformatted, it's re-staged automatically as part of the commit.
 
+### Testing
+
+```bash
+pnpm test
+```
+
+Runs Vitest across every workspace package that has a `test` script, via Turborepo. A pre-commit hook runs formatting, typecheck, and the full test suite automatically before every commit — Turborepo's cache keeps repeat runs fast.
+
+Currently covered:
+
+- `@todo/query-toolkit` — optimistic cache logic (pure, no DOM)
+- `@todo/ui` — pagination math (`getPageNumbers`, pure, no DOM)
+- `apps/app` — component behavior (jsdom + React Testing Library) and mutation hooks (`renderHook`, mocked API layer, real cache logic) for tasks and auth
+
+**Not yet covered:** `SortableList`, `List`, `AsyncList` — these depend on `react-native-draggable-flatlist`, `@dnd-kit`, and `@tanstack/react-virtual`, which need real browser layout APIs jsdom doesn't reliably provide. See `docs/testing-notes.md`.
+
+### E2E Testing Setup (one-time, per developer)
+
+E2E tests (Playwright) run against a dedicated Supabase project, never
+against production data.
+
+1. Create a separate Supabase project named `todo-e2e`.
+2. Create one fixed test user in it (Dashboard → Authentication → Users →
+   Add User — skip email confirmation).
+3. Create `.env.e2e` in the repo root (gitignored) with:
+
+```env
+EXPO_PUBLIC_SUPABASE_URL=<e2e project URL>
+EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<e2e project anon key>
+E2E_TEST_USER_EMAIL=<test user email>
+E2E_TEST_USER_PASSWORD=<test user password>
+E2E_PROJECT_REF=<e2e project ref>
+```
+
+4. Add `PROD_PROJECT_REF=<main project ref>` to the existing root `.env`
+   if it isn't already there.
+5. Install the Playwright browser binary (one-time, per machine):
+
+```bash
+pnpm --filter @todo/app exec playwright install chromium
+```
+
+6. Push the schema to the new project:
+
+```bash
+pnpm db:push:e2e
+```
+
+7. Run the suite:
+
+```bash
+pnpm test:e2e
+```
+
+See `docs/supabase.md` for keeping the E2E project's schema in sync going
+forward, and `docs/testing-notes.md` for E2E scope and known gaps.
+
 ## Project Structure
 
 ```text
@@ -173,6 +230,20 @@ supabase/
 ## Offline Support Notes
 
 The app persists its data cache to disk (`AsyncStorage` on native, `localStorage` on web) and wires real device connectivity detection (`@react-native-community/netinfo` on native, browser events on web). No additional setup or environment variables are required for this — it's active automatically once dependencies are installed. See `docs/architecture.md` for what is and isn't covered by current offline support.
+
+## Continuous Integration
+
+Every push and pull request against `main` runs `.github/workflows/ci.yml`, which checks:
+
+- Formatting (`pnpm format:check`)
+- TypeScript (`pnpm typecheck`)
+- Tests (`pnpm test`)
+
+CI does not require any GitHub Secrets — it writes placeholder values for `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` since none of the CI checks make real Supabase calls. E2E tests are not yet wired into CI — see `docs/testing-notes.md`.
+
+To make these checks required before merging, enable branch protection on `main` in the repository settings and require the `ci` status check to pass.
+
+Continuous Deployment (building and publishing the app via EAS) is not yet configured — see `docs/architecture.md`'s Upcoming section.
 
 ## Troubleshooting
 
@@ -228,37 +299,20 @@ Verify it is available:
 pnpm dlx supabase --version
 ```
 
+### Playwright browser not found
+
+If `pnpm test:e2e` fails with an error like `Executable doesn't exist at ...chrome-headless-shell...`, the Playwright browser binaries haven't been downloaded yet (installing the `@playwright/test` npm package does not do this automatically). Run:
+
+```bash
+pnpm --filter @todo/app exec playwright install chromium
+```
+
+### E2E web server times out
+
+`expo start --web` can take over a minute on a cold Metro bundle (especially with Tamagui's babel plugin). If `pnpm test:e2e` times out waiting for the dev server, this is expected on a cold start — `playwright.config.ts`'s `webServer.timeout` is set to accommodate it. For faster local iteration, start the dev server manually in one terminal (`pnpm --filter @todo/app exec expo start --web`) and run `pnpm test:e2e` in another — Playwright reuses the already-running server outside of CI.
+
 ## Additional Documentation
 
 - `docs/supabase.md` — Database migrations and Supabase workflow.
 - `docs/architecture.md` — Project architecture.
-
-### Testing
-
-```bash
-pnpm test
-```
-
-Runs Vitest across every workspace package that has a `test` script, via Turborepo. A pre-commit hook runs formatting, typecheck, and the full test suite automatically before every commit — Turborepo's cache keeps repeat runs fast.
-
-Currently covered:
-
-- `@todo/query-toolkit` — optimistic cache logic (pure, no DOM)
-- `@todo/ui` — pagination math (`getPageNumbers`, pure, no DOM)
-- `apps/app` — `AddTaskForm` component behavior (jsdom + React Testing Library), `useCreateTask`'s paged-mode optimistic cache write (renderHook, mocked API layer, real cache logic)
-
-**Not yet covered:** `SortableList`, `List`, `AsyncList` — these depend on `react-native-draggable-flatlist`, `@dnd-kit`, and `@tanstack/react-virtual`, which need real browser layout APIs jsdom doesn't reliably provide. Testing these needs either a real browser test runner (Playwright component testing) or heavier jsdom polyfilling (`ResizeObserver`, pointer events) — deliberately deferred rather than faked with a brittle jsdom shim. See `docs/testing-notes.md`.
-
-## Continuous Integration
-
-Every push and pull request against `main` runs `.github/workflows/ci.yml`, which checks:
-
-- Formatting (`pnpm format:check`)
-- TypeScript (`pnpm typecheck`)
-- Tests (`pnpm test`)
-
-CI does not require any GitHub Secrets — it writes placeholder values for `EXPO_PUBLIC_SUPABASE_URL`/`EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY` since none of the CI checks make real Supabase calls.
-
-To make these checks required before merging, enable branch protection on `main` in the repository settings and require the `ci` status check to pass.
-
-Continuous Deployment (building and publishing the app via EAS) is not yet configured — see `docs/architecture.md`'s Upcoming section.
+- `docs/testing-notes.md` — Test coverage status, known gaps, and E2E scope.

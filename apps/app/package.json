@@ -41,6 +41,7 @@
     "zustand": "^5.0.14"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
     "@tamagui/babel-plugin": "^2.6.2",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.0.1",
@@ -48,6 +49,8 @@
     "@types/react": "~19.2.2",
     "@vitejs/plugin-react": "^4.3.4",
     "babel-preset-expo": "^57.0.5",
+    "dotenv": "^16.6.1",
+    "dotenv-cli": "^8.0.0",
     "jsdom": "^25.0.1",
     "typescript": "~6.0.3",
     "vitest": "^3.2.4"
@@ -60,7 +63,8 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test:e2e": "dotenv -e ../../.env.e2e -- playwright test"
   },
   "private": true
 }

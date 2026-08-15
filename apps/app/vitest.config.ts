@@ -17,6 +17,7 @@ export default defineConfig({
         singleFork: true,
       },
     },
+    exclude: ["**/node_modules/**", "**/e2e/**"],
     env: {
       EXPO_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co",
       EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "placeholder-key",
