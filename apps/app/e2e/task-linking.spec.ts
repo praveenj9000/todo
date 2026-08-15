@@ -1,15 +1,9 @@
 import { expect, test } from "@playwright/test";
-import { createTaskAndWaitForSync } from "./helpers";
+import { createTaskAndWaitForSync, rowFor } from "./helpers";
 
 const runId = Date.now();
 const parentTitle = `[e2e-${runId}] Tea`;
 const linkedTitle = `[e2e-${runId}] Sugar`;
-
-function rowFor(page: import("@playwright/test").Page, title: string) {
-  return page
-    .getByText(title, { exact: true })
-    .locator("xpath=ancestor::*[starts-with(@data-testid, 'task-row-')][1]");
-}
 
 test("create a task, expand it, add a linked task, see it in the panel", async ({ page }) => {
   await page.goto("/");

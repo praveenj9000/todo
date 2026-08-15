@@ -19,3 +19,19 @@ The SQL/RPC layer (move_task) — no test ever exercised the fractional-midpoint
 enable ruleset in github, settings > RuleSet > Enforcement - Enable it and save
 
 pnpm --filter @todo/app exec expo start --web
+
+Accessibility axe / Playwright Web accessibility Later
+Performance Lighthouse/Playwright Web performance Later
+
+| Layer                      | Tool / approach                          | When                               |
+| -------------------------- | ---------------------------------------- | ---------------------------------- |
+| Unit tests                 | **Vitest**                               | Every commit/PR                    |
+| E2E                        | **Playwright**                           | Every PR                           |
+| Type checking              | TypeScript                               | Every commit/PR                    |
+| Linting                    | ESLint                                   | Every commit/PR                    |
+| Dependency vulnerabilities | `pnpm audit` / Dependabot-style scanning | CI / regularly                     |
+| API/security tests         | Automated security tests                 | Every PR                           |
+| Database/RLS tests         | Supabase SQL tests                       | Every PR                           |
+| SAST                       | CodeQL/Semgrep                           | CI                                 |
+| DAST                       | OWASP ZAP                                | CI/nightly                         |
+| Full penetration test      | Manual pentest                           | Before production / major releases |

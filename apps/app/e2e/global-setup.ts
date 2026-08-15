@@ -1,6 +1,9 @@
 import { chromium, type FullConfig } from "@playwright/test";
+import { deleteAllE2ETasks } from "./cleanup";
 
 export default async function globalSetup(config: FullConfig) {
+  await deleteAllE2ETasks();
+
   const baseURL = config.projects[0].use.baseURL!;
 
   const browser = await chromium.launch();

@@ -286,3 +286,38 @@ niche. Still a genuine project on its own (RLS redesign + connection model
   shared-lists idea if choosing between the two.
 
 **Status:** interesting, not scoped or started.
+
+### Checklists (separate feature, not inside a task)
+
+**Why:** a genuinely different usage pattern from tasks, not just a
+renamed list. A checklist ("things to check before leaving for
+vacation": tickets, camera, charge phone) is typically created as a
+batch, worked through in one sitting, and then reset or archived —
+unlike tasks, which accumulate and persist with due dates/priority/
+linking. Distinct from the earlier "Subtasks" idea (checklist items
+nested inside one task) and from "Projects/lists" (user-named
+groupings of ordinary tasks) — this is its own top-level feature with
+its own object model and its own tab/section in the app.
+
+**Roughly:**
+
+- A `checklists` table (name, created_at) and a `checklist_items` table
+  (checklist_id, title, checked, sort_order) — deliberately not reusing
+  the `tasks` table, since checklist items don't need due dates,
+  filters, linking, or most of what `tasks` carries.
+- A "reset" action per checklist: uncheck every item without deleting
+  them, so a recurring checklist (e.g. "Pre-flight checklist") can be
+  reused trip after trip instead of recreated from scratch each time.
+- Reuses existing `@todo/ui` primitives (`List`/`SortableList`) for
+  rendering and reordering items — no new list-rendering work needed,
+  same pattern the tasks feature already uses.
+- A new tab/section in navigation, separate from the tasks screen.
+
+**Priority read:** cheap relative to its value — most of the underlying
+list/reorder infrastructure already exists and is reusable as-is; the
+new work is mostly the checklist/checklist_items schema, a reset
+action, and a new screen wiring existing components together. A good
+candidate for "next feature built," comparable in scope to soft
+delete or due dates.
+
+**Status:** not started.

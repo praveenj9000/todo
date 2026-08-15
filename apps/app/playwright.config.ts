@@ -10,6 +10,7 @@ export default defineConfig({
     baseURL: "http://localhost:8081",
     trace: "retain-on-failure",
   },
+  timeout: 45_000,
   webServer: {
     command: "expo start --web --port 8081",
     url: "http://localhost:8081",

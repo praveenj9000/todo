@@ -1,5 +1,11 @@
 import type { Page } from "@playwright/test";
 
+export function rowFor(page: Page, title: string) {
+  return page
+    .getByText(title, { exact: true })
+    .locator("xpath=ancestor::*[starts-with(@data-testid, 'task-row-')][1]");
+}
+
 /**
  * Creates a task and waits for the server-confirmed refetch to land
  * before returning — closes the race where the UI shows a task
