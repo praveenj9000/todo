@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 import { createTaskAndWaitForSync, rowFor } from "./helpers";
 
 const runId = Date.now();
@@ -11,6 +12,9 @@ test("create, complete, and delete a task", async ({ page }) => {
 
   const row = rowFor(page, taskTitle);
   await expect(row).toBeVisible();
+
+  const accessibilityResults = await new AxeBuilder({ page }).analyze();
+  expect(accessibilityResults.violations).toEqual([]);
 
   await row.getByText("○").click();
   await row.getByText("Delete").click();

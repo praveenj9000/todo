@@ -9,8 +9,7 @@ if (target !== "prod" && target !== "e2e") {
   process.exit(1);
 }
 
-const envFile =
-  target === "prod" ? resolve(".env") : resolve(".env.e2e");
+const envFile = target === "prod" ? resolve(".env") : resolve(".env.e2e");
 
 const varName = target === "prod" ? "PROD_PROJECT_REF" : "E2E_PROJECT_REF";
 

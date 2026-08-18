@@ -1,11 +1,6 @@
 import { createContext, useContext } from "react";
-
-import type { PropsWithChildren } from "react";
-
 import { useSortable } from "@dnd-kit/sortable";
-
 import { CSS } from "@dnd-kit/utilities";
-
 import type { SortableItemProps } from "./types";
 
 type ContextValue = ReturnType<typeof useSortable>;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Platform, Pressable, Text, TextInput, View } from "react-native";
 
 import type { PaginationToolbarProps } from "./types";
@@ -16,10 +16,12 @@ export function PaginationToolbar({
   disabled = false,
 }: PaginationToolbarProps) {
   const [pageInput, setPageInput] = useState(String(page));
+  const [prevPage, setPrevPage] = useState(page);
 
-  useEffect(() => {
+  if (page !== prevPage) {
+    setPrevPage(page);
     setPageInput(String(page));
-  }, [page]);
+  }
 
   if (totalPages <= 1 && !onPageSizeChange) {
     return null;
@@ -107,6 +109,7 @@ export function PaginationToolbar({
         <TextInput
           value={pageInput}
           onChangeText={setPageInput}
+          aria-label="Current page number"
           onBlur={commitPageInput}
           onSubmitEditing={commitPageInput}
           editable={!disabled}

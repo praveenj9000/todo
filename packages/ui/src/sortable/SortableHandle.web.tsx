@@ -9,6 +9,7 @@ export function SortableHandle({ children }: PropsWithChildren) {
     <div
       {...listeners}
       {...attributes}
+      aria-label="Drag to reorder"
       style={{
         cursor: "grab",
         display: "inline-flex",

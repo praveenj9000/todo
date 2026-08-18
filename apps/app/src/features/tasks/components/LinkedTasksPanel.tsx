@@ -100,7 +100,7 @@ export function LinkedTasksPanel({ taskId }: Props) {
 
       {status === "not-found" ? (
         <Text fontSize="$1" color="$gray10">
-          Couldn't locate that task
+          Couldn&apos;t locate that task
         </Text>
       ) : null}
 

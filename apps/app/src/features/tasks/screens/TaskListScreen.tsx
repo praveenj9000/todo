@@ -10,7 +10,7 @@ export function TaskListScreen() {
 
   return (
     <TaskScrollProvider>
-      <YStack flex={1}>
+      <YStack flex={1} role="main">
         <AddTaskForm />
         <TaskFilters />
 

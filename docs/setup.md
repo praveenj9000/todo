@@ -145,6 +145,14 @@ Checks formatting without writing changes — useful in CI.
 
 A pre-commit hook (via Husky + lint-staged) automatically formats staged files with Prettier before each commit — no manual `pnpm format` step needed. If a file gets reformatted, it's re-staged automatically as part of the commit.
 
+### Linting
+
+```bash
+pnpm lint
+```
+
+Runs ESLint across the repo. Included in the pre-commit hook alongside formatting, typecheck, and tests.
+
 ### Testing
 
 ```bash

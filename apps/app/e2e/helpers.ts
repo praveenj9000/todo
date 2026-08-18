@@ -29,5 +29,5 @@ export async function createTaskAndWaitForSync(page: Page, title: string) {
     (res) => res.request().method() === "GET" && res.url().includes("/rest/v1/tasks"),
   );
 
-  await page.getByText(title).waitFor({ state: "visible" });
+  await page.getByText(title).waitFor({ state: "visible", timeout: 20_000 });
 }

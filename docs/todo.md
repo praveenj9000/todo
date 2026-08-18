@@ -20,8 +20,7 @@ enable ruleset in github, settings > RuleSet > Enforcement - Enable it and save
 
 pnpm --filter @todo/app exec expo start --web
 
-Accessibility axe / Playwright Web accessibility Later
-Performance Lighthouse/Playwright Web performance Later
+Accessibility axe / Playwright, Performance Lighthouse/Playwright, Linting, Dependency vulnerabilities, API/security tests, Database/RLS tests, SAST, DAST, penetration test
 
 | Layer                      | Tool / approach                          | When                               |
 | -------------------------- | ---------------------------------------- | ---------------------------------- |

@@ -34,9 +34,9 @@ export function TaskRow({ task, onToggleCompleted, onDelete, DragHandle }: Props
 
         {DragHandle ? (
           <DragHandle>
-            <Button chromeless size="$3">
+            <Text fontSize="$5" aria-hidden={true}>
               ☰
-            </Button>
+            </Text>
           </DragHandle>
         ) : null}
 

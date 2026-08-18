@@ -175,3 +175,47 @@ pre-commit hook (`format` → `typecheck` → `test`) the way the current Vitest
 suite does. The standard pattern is running E2E in CI only (on PR or on a
 schedule), not on every local commit — this repo's CI/E2E split isn't set up
 yet either, and would need to be part of this work when it starts.
+
+---
+
+## 5. Additional testing/security layers — status and plan
+
+Beyond the unit/component and E2E suites already in place:
+
+**Added:**
+
+- **ESLint** (`pnpm lint`) — catches issues `tsc`/Prettier don't (unused vars, hooks-rules violations, React-specific pitfalls). Runs in pre-commit alongside format/typecheck/test.
+- **Dependency audit** (`pnpm audit`) — runs in CI (non-blocking initially), plus GitHub Dependabot alerts enabled at the repo-settings level.
+- **Accessibility (axe)** — `@axe-core/playwright` bolted onto existing E2E specs; checks the already-rendered pages for a11y violations at near-zero extra cost, rather than a separate test suite.
+- **SAST (CodeQL)** — free, GitHub-hosted static security analysis, runs on push/PR/weekly schedule. Findings surface under the repo's Security tab.
+
+**Deliberately deferred, with reasoning:**
+
+- **Lighthouse (performance)** — needs a production-like build and a real deployed target to test meaningfully; testing against a local dev server with hot-reload overhead isn't representative. Revisit once CD/EAS builds exist.
+- **Database/RLS tests** — a real, higher-priority gap specific to this app (an RLS bug is invisible until it leaks another user's data), not yet built. Natural next step given the E2E Supabase test project already exists: direct SQL/RPC assertions that user A cannot read/write user B's rows. Prioritize this before Lighthouse.
+- **DAST (dynamic security scanning, e.g. OWASP ZAP) and penetration testing** — appropriate closer to a real production launch with real user data and a security budget, not for a pre-launch solo-developer project. Revisit at that point, not before.
+- **"API/security tests"** as a standalone category — too vague to scope as stated; if it means "unauthorized requests get rejected," that's covered by the RLS testing item above once built. If it means something broader (fuzzing, injection testing), that overlaps with DAST and should be scoped together with it, later.
+
+---
+
+## 6. E2E flakiness under repeated full-suite runs — infrastructure, not code
+
+**Observed:** running `pnpm test:e2e` multiple times in quick succession
+against the `todo-e2e` free-tier Supabase project produces inconsistent
+results with zero code changes — one clean pass, followed by widespread
+timeouts specifically at task-creation waits, followed by a single
+isolated flake. This pattern (same code, different outcomes, failures
+concentrated at network-bound waits rather than assertions/logic) points
+at Supabase connection-pool saturation or free-tier cold-start behavior
+under repeated back-to-back runs, not a bug in the app or tests.
+
+**Mitigation applied:** reduced `pagination.spec.ts`'s task-creation
+volume (11 → 6), added an explicit generous timeout to
+`createTaskAndWaitForSync`'s wait.
+
+**If this recurs:** avoid running the full suite repeatedly in quick
+succession locally — run individual spec files instead, or space runs
+out. Check the `todo-e2e` project's connection/usage dashboard to
+confirm pool saturation directly. A paid Supabase tier (higher
+connection limits) would likely resolve this if it becomes a persistent
+CI blocker later.

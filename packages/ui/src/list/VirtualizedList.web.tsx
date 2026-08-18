@@ -17,6 +17,7 @@ export function VirtualizedList<T>({
 }: ListProps<T>) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- react-virtual's API is inherently unmemoizable by React Compiler; not a bug.
   const virtualizer = useVirtualizer({
     count: data.length,
     getScrollElement: () => scrollContainerRef.current,
