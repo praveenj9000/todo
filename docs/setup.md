@@ -210,6 +210,53 @@ pnpm test:e2e
 See `docs/supabase.md` for keeping the E2E project's schema in sync going
 forward, and `docs/testing-notes.md` for E2E scope and known gaps.
 
+### Local E2E Testing (recommended for day-to-day use)
+
+Running E2E tests against the hosted `todo-e2e` Supabase project (see
+above) works but can be unreliable under repeated runs — free-tier
+connection-pool limits and cold starts cause intermittent, non-code-related
+failures. Running Supabase locally via Docker eliminates this entirely and
+is the recommended default for local iteration; the hosted project setup
+above remains useful for testing against a real network/paid-tier backend
+later.
+
+**Prerequisite: Docker Desktop.**
+
+- **Windows**: https://www.docker.com/products/docker-desktop/ — install,
+  keep WSL 2 selected, reboot, launch once and accept the license terms.
+- **macOS**: https://www.docker.com/products/docker-desktop/ — install,
+  launch once, accept the license terms.
+- **Linux**: https://docs.docker.com/engine/install/ — install Docker
+  Engine, add your user to the `docker` group.
+
+Verify: `docker info` should print without error.
+
+**One-time (or after a reboot) setup:**
+
+```bash
+pnpm test:e2e:local:setup
+```
+
+This starts a full local Supabase stack (Postgres, Auth, REST, Realtime)
+in Docker, applies every migration automatically, creates a local test
+user, and writes `.env.e2e.local` (gitignored) with the connection details.
+
+**Run the suite:**
+
+```bash
+pnpm test:e2e:local
+```
+
+The local Supabase stack keeps running between test runs — no need to
+repeat the setup step each time, only after a reboot or an explicit
+`pnpm dlx supabase stop`.
+
+**Stopping the local stack** (frees Docker resources when you're done):
+
+```bash
+pnpm dlx supabase stop
+```
+
 ## Project Structure
 
 ```text

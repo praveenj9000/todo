@@ -77,6 +77,7 @@ export default [
       "**/node_modules/**",
       "**/dist/**",
       "**/.expo/**",
+      "**/.temp/**",
       "**/e2e/.auth/**",
       "**/test-results/**",
       "packages/types/src/database.ts",

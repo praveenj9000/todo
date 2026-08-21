@@ -2,3 +2,4 @@ pnpm format:staged
 pnpm lint
 pnpm typecheck
 pnpm test
+pnpm test:e2e:local

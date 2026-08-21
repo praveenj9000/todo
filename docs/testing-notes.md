@@ -213,9 +213,13 @@ under repeated back-to-back runs, not a bug in the app or tests.
 volume (11 → 6), added an explicit generous timeout to
 `createTaskAndWaitForSync`'s wait.
 
-**If this recurs:** avoid running the full suite repeatedly in quick
-succession locally — run individual spec files instead, or space runs
-out. Check the `todo-e2e` project's connection/usage dashboard to
-confirm pool saturation directly. A paid Supabase tier (higher
-connection limits) would likely resolve this if it becomes a persistent
-CI blocker later.
+**Resolution:** added `pnpm test:e2e:local`, running the full suite
+against a local Supabase stack (Docker) instead of the hosted free-tier
+project — eliminates connection-pool/cold-start variance entirely, since
+there's no network hop or shared infrastructure involved. This is now
+the recommended path for day-to-day local iteration; see
+`docs/setup.md`'s "Local E2E Testing" section for setup.
+
+`pnpm test:e2e` (hosted) is kept for testing against a real network
+backend, and remains the natural path to validate against a future paid
+Supabase tier — nothing about the hosted setup was removed.

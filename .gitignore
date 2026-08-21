@@ -16,6 +16,7 @@ web-build/
 .env
 .env.*
 apps/app/.env
+.env.e2e.local
 # Do not ignore .env.example
 !.env.example
 !.env.e2e.example
