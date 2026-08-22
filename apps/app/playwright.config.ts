@@ -12,7 +12,7 @@ export default defineConfig({
   },
   timeout: 45_000,
   webServer: {
-    command: "dotenv -e ../../.env.e2e.local -- expo start --web --port 8081",
+    command: "cross-env EXPO_NO_DOTENV=1 expo start --web --port 8081",
     url: "http://localhost:8081",
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
