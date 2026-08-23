@@ -33,6 +33,7 @@
     "db:link:prod": "node scripts/db-link.mjs prod",
     "db:link:e2e": "node scripts/db-link.mjs e2e",
     "db:push:e2e": "node scripts/db-push-e2e.mjs",
+    "dump:changes": "node scripts/dump-changed-files.mjs",
     "test:e2e:local:setup": "node scripts/setup-e2e-local.mjs",
     "test:e2e:local": "pnpm --filter @todo/app test:e2e:local",
     "test:e2e": "pnpm --filter @todo/app test:e2e",
