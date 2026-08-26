@@ -1,3 +1,4 @@
+import type React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, screen } from "@testing-library/react";
 import type { PropsWithChildren } from "react";
@@ -12,6 +13,7 @@ const baseTask: Task = {
   title: "Buy milk",
   completed: false,
   completed_at: null,
+  list_id: "list-1",
   sort_order: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
@@ -90,6 +92,3 @@ describe("TaskRow", () => {
     expect(screen.getByText("☰")).toBeInTheDocument();
   });
 });
-
-// react needed for the inline component above
-import type React from "react";

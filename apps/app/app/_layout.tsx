@@ -15,8 +15,9 @@ function RootNavigator() {
   }
 
   const inAuthGroup = segments[0] === "(auth)";
+  const inShareGroup = segments[0] === "share";
 
-  if (!session && !inAuthGroup) {
+  if (!session && !inAuthGroup && !inShareGroup) {
     return <Redirect href="/(auth)/login" />;
   }
 

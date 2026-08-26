@@ -1,5 +1,6 @@
 import { chromium, type FullConfig } from "@playwright/test";
 import { deleteAllE2ETasks } from "./cleanup";
+import { ensureListSelected } from "./helpers";
 
 export default async function globalSetup(config: FullConfig) {
   await deleteAllE2ETasks();
@@ -39,6 +40,8 @@ export default async function globalSetup(config: FullConfig) {
     const bodyText = await page.locator("body").innerText();
     console.log(`[global-setup] Page text after login attempt:\n${bodyText}`);
   }
+
+  await ensureListSelected(page);
 
   try {
     await page.getByPlaceholder("Add a task...").waitFor({ timeout: 15_000 });

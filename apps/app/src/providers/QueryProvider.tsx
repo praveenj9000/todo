@@ -5,6 +5,7 @@ import { QueryClient } from "@tanstack/react-query";
 import { createAsyncStoragePersister } from "@tanstack/query-async-storage-persister";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { setupOnlineManager } from "@todo/query-toolkit";
+import { registerListsMutationDefaults } from "@/features/lists";
 import { registerTaskMutationDefaults } from "@/features/tasks/registerMutationDefaults";
 
 const ONE_DAY_MS = 1000 * 60 * 60 * 24;
@@ -24,6 +25,7 @@ const queryClient = new QueryClient({
 // further down) needs these defaults already registered or it has nothing
 // to call for mutations that were paused before the app was last killed.
 registerTaskMutationDefaults(queryClient);
+registerListsMutationDefaults(queryClient);
 
 const persister = createAsyncStoragePersister({
   storage: AsyncStorage,

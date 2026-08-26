@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { rowFor } from "./helpers";
+import { ensureListSelected, rowFor } from "./helpers";
 
 const runId = Date.now();
 const taskTitle = `[e2e-${runId}] Offline task`;
@@ -14,6 +14,8 @@ test("a task created while offline appears immediately and syncs on reconnect", 
     .getByText(/No tasks yet|task-row-/)
     .waitFor({ timeout: 15_000 })
     .catch(() => {});
+
+  await ensureListSelected(page);
 
   await context.setOffline(true);
 

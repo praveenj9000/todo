@@ -39,6 +39,77 @@ export type Database = {
   }
   public: {
     Tables: {
+      list_shares: {
+        Row: {
+          created_at: string
+          id: string
+          list_id: string
+          permission: string
+          subject_id: string
+          subject_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          list_id: string
+          permission: string
+          subject_id: string
+          subject_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          list_id?: string
+          permission?: string
+          subject_id?: string
+          subject_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "list_shares_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lists: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          public_edit: boolean
+          public_read: boolean
+          share_token: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          public_edit?: boolean
+          public_read?: boolean
+          share_token?: string
+          type?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          public_edit?: boolean
+          public_read?: boolean
+          share_token?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       task_links: {
         Row: {
           created_at: string
@@ -94,6 +165,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          list_id: string
           sort_order: number
           title: string
           updated_at: string
@@ -104,6 +176,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          list_id: string
           sort_order?: number
           title: string
           updated_at?: string
@@ -114,12 +187,21 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           id?: string
+          list_id?: string
           sort_order?: number
           title?: string
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tasks_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "lists"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -133,6 +215,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          list_id: string
           sort_order: number
           title: string
           updated_at: string
@@ -153,6 +236,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           id: string
+          list_id: string
           sort_order: number
           title: string
           updated_at: string

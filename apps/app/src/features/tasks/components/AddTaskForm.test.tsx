@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 
 import { renderWithProviders } from "@/test/renderWithProviders";
 
+import { useListsStore } from "@/features/lists/stores/lists-ui.store";
+
 import { AddTaskForm } from "./AddTaskForm";
 
 const mutateMock = vi.fn();
@@ -17,6 +19,7 @@ vi.mock("../hooks/useCreateTask", () => ({
 describe("AddTaskForm", () => {
   beforeEach(() => {
     mutateMock.mockClear();
+    useListsStore.setState({ selectedListId: "list-1" });
   });
 
   it("clears the input immediately on submit, without waiting for the mutation", async () => {
@@ -35,7 +38,7 @@ describe("AddTaskForm", () => {
     // mutation's network call resolved (broken specifically while
     // offline, since a paused mutation never resolves until reconnect).
     expect(input).toHaveValue("");
-    expect(mutateMock).toHaveBeenCalledWith({ title: "Buy milk" });
+    expect(mutateMock).toHaveBeenCalledWith({ title: "Buy milk", list_id: "list-1" });
   });
 
   it("does not call the mutation for an empty or whitespace-only title", async () => {

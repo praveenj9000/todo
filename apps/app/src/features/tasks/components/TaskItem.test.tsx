@@ -1,3 +1,4 @@
+import type React from "react";
 import { describe, expect, it, vi } from "vitest";
 import { fireEvent, screen } from "@testing-library/react";
 
@@ -28,6 +29,7 @@ const task: Task = {
   title: "Buy milk",
   completed: false,
   completed_at: null,
+  list_id: "list-1",
   sort_order: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
@@ -66,5 +68,3 @@ describe("TaskItem", () => {
     expect(deleteMutateMock).toHaveBeenCalledWith("1");
   });
 });
-
-import type React from "react";

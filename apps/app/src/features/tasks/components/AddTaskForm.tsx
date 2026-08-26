@@ -2,17 +2,21 @@ import { useState } from "react";
 
 import { Button, Input, XStack } from "tamagui";
 
+import { useListsStore } from "@/features/lists/stores/lists-ui.store";
+
 import { useCreateTask } from "../hooks/useCreateTask";
 
 export function AddTaskForm() {
   const [title, setTitle] = useState("");
+
+  const selectedListId = useListsStore((state) => state.selectedListId);
 
   const { mutate: createTask } = useCreateTask();
 
   function handleSubmit() {
     const value = title.trim();
 
-    if (!value) {
+    if (!value || !selectedListId) {
       return;
     }
 
@@ -20,6 +24,7 @@ export function AddTaskForm() {
 
     createTask({
       title: value,
+      list_id: selectedListId,
     });
   }
 

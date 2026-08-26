@@ -34,11 +34,16 @@ export async function getTasksPage({
   sort,
   cursor,
   limit = TASKS_PAGE_SIZE,
+  listId,
 }: GetTasksPageInput): Promise<TasksPage> {
   const column = SORT_COLUMN[sort];
   const ascending = SORT_ASCENDING[sort];
 
   let query = supabase.from("tasks").select("*");
+
+  if (listId) {
+    query = query.eq("list_id", listId);
+  }
 
   switch (filter) {
     case "active":
@@ -88,11 +93,16 @@ export async function getTasksPageOffset({
   sort,
   page,
   pageSize,
+  listId,
 }: GetTasksPageOffsetInput): Promise<TasksOffsetPage> {
   const column = SORT_COLUMN[sort];
   const ascending = SORT_ASCENDING[sort];
 
   let query = supabase.from("tasks").select("*", { count: "exact" });
+
+  if (listId) {
+    query = query.eq("list_id", listId);
+  }
 
   switch (filter) {
     case "active":
@@ -121,7 +131,7 @@ export async function getTasksPageOffset({
   };
 }
 
-export async function createTask(input: Pick<NewTask, "title">): Promise<Task> {
+export async function createTask(input: Pick<NewTask, "title" | "list_id">): Promise<Task> {
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -134,6 +144,7 @@ export async function createTask(input: Pick<NewTask, "title">): Promise<Task> {
     .from("tasks")
     .insert({
       title: input.title,
+      list_id: input.list_id,
       user_id: user.id,
     })
     .select()

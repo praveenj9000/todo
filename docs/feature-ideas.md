@@ -162,15 +162,39 @@ effort rather than one-off per service.)
 **Roughly:** iCal feed to start; two-way Google Calendar sync as a larger
 follow-up.
 
-### Shareable read-only task list link
+### List sharing (public read-only + per-user permissions) — implemented
 
-**Why:** a genuine growth/viral mechanic — someone shares a packing list or
-project checklist via a public link, some fraction of viewers sign up.
-Much smaller in scope than full collaboration: no membership model, no RLS
-rewrite, just a public read-only view behind a generated token.
-**Priority read:** the strongest "business value per unit of engineering
-effort" idea on this list, and a natural, low-risk stepping stone toward
-shared/collaborative lists without committing to that architecture yet.
+**Status: implemented.** Lists (both todo lists and checklists) support
+two tiers of sharing:
+
+1. **Public read-only link** — a genuine growth/viral mechanic: someone
+   shares a packing list or project checklist via a public link, some
+   fraction of viewers sign up. No membership model, no RLS rewrite, just
+   a public read-only view behind a generated token.
+2. **Share with specific users** — each shared user is granted either
+   **read-only** or **editable** rights on the list. Small, fixed set of
+   people (family, household, 2-3 collaborators), not a generic team
+   workspace — no roles table, no org concept, just a per-user permission
+   on a list.
+
+**Implemented schema:** a `share_token` column on `lists` for public links,
+plus a `list_shares` table (`list_id`, `subject_type` in (`user`, `group`),
+`subject_id`, `permission` in (`read`, `edit`)) for per-user sharing, with
+RLS policies extended so a user can read (and, if permitted, write) lists
+they're shared on but don't own. Realtime sync extends naturally since the
+subscription filter gains an "owner or shared-with-me" clause.
+
+**Access rules:** unauthenticated/logged-out users are always treated as
+read-only unless explicit public edit access is enabled on the list. Only
+the list owner can manage share settings, grant/revoke access, or delete
+the list.
+
+**Future: groups.** This will be extended to support **groups** — a shared
+list can later belong to a group (e.g. a family, a household, a small team)
+with a single invite granting access to everyone in the group, rather than
+inviting each person individually. Groups are a deliberate future
+extension; the per-user and public-link model is designed so groups can be
+layered on without reworking it.
 
 ### Templates
 

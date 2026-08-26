@@ -34,7 +34,7 @@ describe("useCreateTask — infinite-scroll mode optimistic cache", () => {
   it("writes the optimistic task into the scroll cache, not the paged cache", async () => {
     const client = createTestQueryClient();
 
-    const scrollQueryKey = [...TASKS_QUERY_KEY, "all", "manual"];
+    const scrollQueryKey = [...TASKS_QUERY_KEY, null, "all", "manual"];
 
     client.setQueryData<{ pages: TasksPage[]; pageParams: (TasksCursor | null)[] }>(
       scrollQueryKey,
@@ -48,7 +48,7 @@ describe("useCreateTask — infinite-scroll mode optimistic cache", () => {
       wrapper: ({ children }) => <TestQueryProvider client={client}>{children}</TestQueryProvider>,
     });
 
-    result.current.mutate({ title: "New task" });
+    result.current.mutate({ title: "New task", list_id: "list-1" });
 
     await waitFor(() => {
       const cache = client.getQueryData<{ pages: TasksPage[] }>(scrollQueryKey);
@@ -61,7 +61,7 @@ describe("useCreateTask — infinite-scroll mode optimistic cache", () => {
     // This is the actual regression this test guards against: in
     // infinite-scroll mode, the optimistic write must NOT go to the
     // paged cache key — nothing in this mode reads from it.
-    const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", "all", "manual", 1, 20];
+    const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", null, "all", "manual", 1, 20];
     expect(client.getQueryData(pagedQueryKey)).toBeUndefined();
   });
 });

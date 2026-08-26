@@ -22,6 +22,7 @@ export type GetTasksPageInput = {
   sort: TaskSort;
   cursor: TasksCursor | null;
   limit?: number;
+  listId?: string;
 };
 
 export type MoveTaskInput = {
@@ -35,6 +36,7 @@ export type GetTasksPageOffsetInput = {
   sort: TaskSort;
   page: number;
   pageSize: number;
+  listId?: string;
 };
 
 export type TasksOffsetPage = {

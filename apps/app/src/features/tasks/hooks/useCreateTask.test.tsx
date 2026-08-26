@@ -26,7 +26,7 @@ describe("useCreateTask — paged mode optimistic cache", () => {
   it("writes the optimistic task into the paged cache, not just the infinite-scroll cache", async () => {
     const client = createTestQueryClient();
 
-    const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", "all", "manual", 1, 20];
+    const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", null, "all", "manual", 1, 20];
 
     client.setQueryData<TasksOffsetPage>(pagedQueryKey, {
       tasks: [],
@@ -37,7 +37,7 @@ describe("useCreateTask — paged mode optimistic cache", () => {
       wrapper: ({ children }) => <TestQueryProvider client={client}>{children}</TestQueryProvider>,
     });
 
-    result.current.mutate({ title: "New task" });
+    result.current.mutate({ title: "New task", list_id: "list-1" });
 
     await waitFor(() => {
       const cache = client.getQueryData<TasksOffsetPage>(pagedQueryKey);
@@ -50,7 +50,7 @@ describe("useCreateTask — paged mode optimistic cache", () => {
     // This is the actual regression: before the fix, this hook wrote
     // unconditionally to the infinite-scroll cache key, which nothing
     // in paged mode reads — a silent no-op.
-    const scrollQueryKey = [...TASKS_QUERY_KEY, "all", "manual"];
+    const scrollQueryKey = [...TASKS_QUERY_KEY, null, "all", "manual"];
     const scrollCache = client.getQueryData(scrollQueryKey);
     expect(scrollCache).toBeUndefined();
   });

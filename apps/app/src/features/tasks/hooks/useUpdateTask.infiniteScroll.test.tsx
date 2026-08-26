@@ -27,6 +27,7 @@ const existingTask: Task = {
   title: "Buy milk",
   completed: false,
   completed_at: null,
+  list_id: "list-1",
   sort_order: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
@@ -39,7 +40,7 @@ describe("useUpdateTask — infinite-scroll mode optimistic cache", () => {
 
   it("writes the update into the scroll cache, not the paged cache", async () => {
     const client = createTestQueryClient();
-    const scrollQueryKey = [...TASKS_QUERY_KEY, "all", "manual"];
+    const scrollQueryKey = [...TASKS_QUERY_KEY, null, "all", "manual"];
 
     client.setQueryData<{ pages: TasksPage[]; pageParams: (TasksCursor | null)[] }>(
       scrollQueryKey,
@@ -60,7 +61,7 @@ describe("useUpdateTask — infinite-scroll mode optimistic cache", () => {
       expect(cache?.pages[0].tasks[0].completed).toBe(true);
     });
 
-    const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", "all", "manual", 1, 20];
+    const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", null, "all", "manual", 1, 20];
     expect(client.getQueryData(pagedQueryKey)).toBeUndefined();
   });
 });

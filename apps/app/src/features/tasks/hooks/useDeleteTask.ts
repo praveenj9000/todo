@@ -15,6 +15,7 @@ import { deleteTask } from "../api/tasks";
 import { TASKS_QUERY_KEY } from "../constants/query-keys";
 import { TASK_MUTATION_KEYS } from "../constants/mutation-keys";
 import { useTasksStore } from "../stores/tasks-ui.store";
+import { useListsStore } from "@/features/lists/stores/lists-ui.store";
 import type { Task, TasksCursor, TasksOffsetPage, TasksPage } from "../types/task";
 
 const scrollAccessor = {
@@ -32,9 +33,10 @@ const IS_PAGED = FEATURES.pagination.enabled && !FEATURES.infiniteScroll.enabled
 export function useDeleteTask() {
   const queryClient = useQueryClient();
   const { filter, sort, page, pageSize } = useTasksStore();
+  const selectedListId = useListsStore((state) => state.selectedListId);
 
-  const scrollQueryKey = [...TASKS_QUERY_KEY, filter, sort];
-  const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", filter, sort, page, pageSize];
+  const scrollQueryKey = [...TASKS_QUERY_KEY, selectedListId, filter, sort];
+  const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", selectedListId, filter, sort, page, pageSize];
 
   return useMutation({
     mutationKey: TASK_MUTATION_KEYS.delete,

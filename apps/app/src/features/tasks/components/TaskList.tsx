@@ -1,6 +1,7 @@
 import { EmptyState, ErrorState, Loading } from "@todo/design-system";
 import { FEATURES } from "@/config/features";
 import { AsyncList } from "@todo/ui/list";
+import { useListsStore } from "@/features/lists";
 
 import { TaskItem } from "./TaskItem";
 
@@ -29,6 +30,7 @@ const emptyStateProps = {
 export function TaskList() {
   const sort = useTasksStore((state) => state.sort);
   const isSortable = FEATURES.dragSort.enabled && sort === TASK_SORTS.MANUAL;
+  const selectedListId = useListsStore((state) => state.selectedListId);
 
   const { mutate: moveTask } = useMoveTask();
 
@@ -44,6 +46,20 @@ export function TaskList() {
     });
   }
 
+  // Guard against fetching with no list filter at all — see the fix
+  // note in useTasks/useTasksPaged: without this, an unset
+  // selectedListId would otherwise silently return tasks across every
+  // list. Checked here rather than assumed, since it's the one state
+  // that must never reach the data hooks unfiltered.
+  if (!selectedListId) {
+    return (
+      <EmptyState
+        title="No list selected"
+        description="Select a list from the sidebar, or create a new one, to get started."
+      />
+    );
+  }
+
   if (PAGINATION_MODE === "paged") {
     return <PagedTaskList isSortable={isSortable} onReorder={handleReorder} />;
   }
@@ -56,12 +72,6 @@ export function TaskList() {
     />
   );
 }
-
-// Still two thin components — rules of hooks require the hook choice
-// to happen before any conditional render, so this can't collapse
-// into one function. Everything below the hook call is now just prop
-// mapping into <AsyncList>; the loading/error/empty/List wiring itself
-// lives in @todo/ui/list.
 
 function ScrollTaskList({
   isSortable,

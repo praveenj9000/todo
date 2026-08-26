@@ -502,6 +502,8 @@ Completed:
 - Offline read support (persisted query cache) and same-session offline mutation retry on reconnect
 - Restart-resumable offline mutation queue for simple CRUD (implemented and verified end-to-end)
 - Realtime sync for live task list updates across devices/tabs (insert/update/delete)
+- List sharing: public read/edit via shareable link, per-user shares with read/edit permissions, and schema support for future group-based sharing
+- Public share view route (`/share/[token]`) accessible without authentication
 - Unit tests for @todo/query-toolkit and @todo/ui pagination logic
 - Component/hook-level tests for apps/app: AddTaskForm, TaskFilters, TaskRow, TaskItem, LoginForm, RegisterForm, and paged-cache mutation regressions
 - CI: automated formatting, typecheck, and test checks on every push/PR

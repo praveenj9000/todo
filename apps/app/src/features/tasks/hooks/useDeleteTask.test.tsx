@@ -19,6 +19,7 @@ const existingTask: Task = {
   title: "Buy milk",
   completed: false,
   completed_at: null,
+  list_id: "list-1",
   sort_order: 0,
   created_at: new Date().toISOString(),
   updated_at: new Date().toISOString(),
@@ -31,7 +32,7 @@ describe("useDeleteTask — paged mode optimistic cache", () => {
 
   it("removes the task from the paged cache", async () => {
     const client = createTestQueryClient();
-    const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", "all", "manual", 1, 20];
+    const pagedQueryKey = [...TASKS_QUERY_KEY, "paged", null, "all", "manual", 1, 20];
 
     client.setQueryData<TasksOffsetPage>(pagedQueryKey, {
       tasks: [existingTask],
