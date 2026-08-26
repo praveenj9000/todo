@@ -189,12 +189,16 @@ read-only unless explicit public edit access is enabled on the list. Only
 the list owner can manage share settings, grant/revoke access, or delete
 the list.
 
-**Future: groups.** This will be extended to support **groups** — a shared
-list can later belong to a group (e.g. a family, a household, a small team)
-with a single invite granting access to everyone in the group, rather than
-inviting each person individually. Groups are a deliberate future
-extension; the per-user and public-link model is designed so groups can be
-layered on without reworking it.
+**Groups (implemented).** A shared list can be shared with a **group** (e.g. a
+family, a household, a small team) via a single invite granting access to every
+member of that group, instead of inviting each person individually. Groups are
+created/managed in **Settings → Groups**, and the share panel lets a list owner
+pick one of their groups to grant read or edit access. Group membership is
+resolved at the database level: `list_shares` rows with `subject_type='group'`
+grant access to a user when their email is a member of that group (checked via
+a `security definer` helper, the same pattern used to break the original
+`list_shares` RLS recursion). The per-user and public-link model was designed so
+groups could be layered on this way without reworking it.
 
 ### Templates
 

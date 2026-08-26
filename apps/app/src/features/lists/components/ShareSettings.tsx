@@ -2,6 +2,9 @@ import { useState } from "react";
 
 import { Button, Input, Text, XStack, YStack } from "tamagui";
 
+import { useGroups } from "@/features/groups/hooks/useGroups";
+
+import type { GroupWithMembers } from "@/features/groups/types/group";
 import { useListShares } from "../hooks/useListShares";
 import { useShareMutations } from "../hooks/useShareMutations";
 
@@ -13,14 +16,35 @@ type Props = {
   onClose: () => void;
 };
 
+function shareDisplayName(
+  share: ListShare,
+  groups: GroupWithMembers[],
+): { name: string; type: "group" | "user" } {
+  if (share.subject_type === "group") {
+    const group = groups.find((candidate) => candidate.id === share.subject_id);
+    return {
+      name: group ? group.name : `Group (${share.subject_id.slice(0, 8)}...)`,
+      type: "group",
+    };
+  }
+
+  return { name: `${share.subject_id.slice(0, 8)}...`, type: "user" };
+}
+
 export function ShareSettings({ list, onClose }: Props) {
   const { data: shares = [] } = useListShares(list.id);
+  const { data: groups = [] } = useGroups();
   const { addShare, changePermission, removeShare, setPublicAccess } = useShareMutations(list.id);
 
   const [userId, setUserId] = useState("");
   const [permission, setPermission] = useState<SharePermission>("read");
 
   const shareUrl = `${window.location.origin}/share/${list.share_token}`;
+
+  const sharedGroupIds = new Set(
+    shares.filter((share) => share.subject_type === "group").map((share) => share.subject_id),
+  );
+  const availableGroups = groups.filter((group) => !sharedGroupIds.has(group.id));
 
   function handleAddUser() {
     const id = userId.trim();
@@ -31,6 +55,10 @@ export function ShareSettings({ list, onClose }: Props) {
 
     addShare.mutate({ subjectType: "user", subjectId: id, permission });
     setUserId("");
+  }
+
+  function handleAddGroup(groupId: string) {
+    addShare.mutate({ subjectType: "group", subjectId: groupId, permission });
   }
 
   function handleTogglePublicRead() {
@@ -46,7 +74,6 @@ export function ShareSettings({ list, onClose }: Props) {
       publicEdit: !list.public_edit,
     });
   }
-
   return (
     <YStack
       position="absolute"
@@ -60,6 +87,7 @@ export function ShareSettings({ list, onClose }: Props) {
       padding="$4"
       gap="$3"
       zIndex={10}
+      overflow="scroll"
     >
       <XStack justifyContent="space-between" alignItems="center">
         <Text fontWeight="bold" fontSize="$5">
@@ -93,17 +121,15 @@ export function ShareSettings({ list, onClose }: Props) {
         </XStack>
 
         <Text fontSize="$2" color="$color11">
-          Anyone with the link can {list.public_read ? "view" : ""}
-          {list.public_read && list.public_edit ? " and " : ""}
-          {list.public_edit ? "edit" : ""}
-          {!list.public_read && !list.public_edit ? "do nothing (link disabled)" : ""}.
+          Anyone with the link can{" "}
+          {list.public_read || list.public_edit ? "view or edit" : "do nothing (link disabled)"}.
         </Text>
 
-        <Input value={shareUrl} editable={false} selectTextOnFocus />
+        <Input value={shareUrl} readOnly selectTextOnFocus />
       </YStack>
 
       <YStack gap="$2">
-        <Text fontWeight="bold">Share with specific users</Text>
+        <Text fontWeight="bold">Share with a specific user</Text>
 
         <XStack gap="$2">
           <Input
@@ -124,34 +150,76 @@ export function ShareSettings({ list, onClose }: Props) {
             Add
           </Button>
         </XStack>
+      </YStack>
+
+      <YStack gap="$2">
+        <Text fontWeight="bold">Share with a group</Text>
+
+        {groups.length === 0 ? (
+          <Text fontSize="$2" color="$color11">
+            No groups yet. Create one in Settings → Groups, then share it here.
+          </Text>
+        ) : null}
+
+        {groups.length > 0 && availableGroups.length === 0 ? (
+          <Text fontSize="$2" color="$color11">
+            Every group is already shared on this list.
+          </Text>
+        ) : null}
+
+        {availableGroups.map((group) => (
+          <XStack key={group.id} gap="$2" alignItems="center">
+            <Text flex={1} fontSize="$2" numberOfLines={1}>
+              {group.name} ({group.group_members.length} member
+              {group.group_members.length === 1 ? "" : "s"})
+            </Text>
+            <Button size="$2" onPress={() => handleAddGroup(group.id)}>
+              Add ({permission})
+            </Button>
+          </XStack>
+        ))}
+      </YStack>
+
+      <YStack gap="$2">
+        <Text fontWeight="bold">Shared with</Text>
 
         {shares.length === 0 ? (
           <Text fontSize="$2" color="$color11">
-            No users shared yet.
+            No one is shared on this list yet.
           </Text>
         ) : (
-          shares.map((share: ListShare) => (
-            <XStack key={share.id} gap="$2" alignItems="center">
-              <Text flex={1} fontSize="$2">
-                {share.subject_id.slice(0, 8)}...
-              </Text>
-              <Button
-                size="$2"
-                chromeless
-                onPress={() =>
-                  changePermission.mutate({
-                    id: share.id,
-                    permission: share.permission === "read" ? "edit" : "read",
-                  })
-                }
-              >
-                {share.permission}
-              </Button>
-              <Button size="$2" chromeless theme="red" onPress={() => removeShare.mutate(share.id)}>
-                ✕
-              </Button>
-            </XStack>
-          ))
+          shares.map((share: ListShare) => {
+            const { name, type } = shareDisplayName(share, groups);
+
+            return (
+              <XStack key={share.id} gap="$2" alignItems="center">
+                <Text flex={1} fontSize="$2" numberOfLines={1}>
+                  {type === "group" ? "👥 " : ""}
+                  {name}
+                </Text>
+                <Button
+                  size="$2"
+                  chromeless
+                  onPress={() =>
+                    changePermission.mutate({
+                      id: share.id,
+                      permission: share.permission === "read" ? "edit" : "read",
+                    })
+                  }
+                >
+                  {share.permission}
+                </Button>
+                <Button
+                  size="$2"
+                  chromeless
+                  theme="red"
+                  onPress={() => removeShare.mutate(share.id)}
+                >
+                  ✕
+                </Button>
+              </XStack>
+            );
+          })
         )}
       </YStack>
     </YStack>
