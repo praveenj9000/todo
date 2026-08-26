@@ -39,6 +39,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      group_members: {
+        Row: {
+          created_at: string
+          email: string
+          group_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          group_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          group_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          owner_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          owner_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          owner_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       list_shares: {
         Row: {
           created_at: string
