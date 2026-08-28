@@ -6,7 +6,7 @@ const OUTPUT_FILE = "all_changed_files.txt";
 try {
   // Get all modified, added, or untracked files
   const statusOutput = execSync("git status --porcelain", { encoding: "utf8" });
-  
+
   const files = statusOutput
     .split("\n")
     .map((line) => line.trim())

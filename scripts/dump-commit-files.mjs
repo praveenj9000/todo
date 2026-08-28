@@ -49,7 +49,7 @@ try {
 
   writeFileSync(OUTPUT_FILE, content, "utf8");
   console.log(
-    `Successfully exported ${files.length} file(s) from commit ${commitHash} to ${OUTPUT_FILE}`
+    `Successfully exported ${files.length} file(s) from commit ${commitHash} to ${OUTPUT_FILE}`,
   );
 } catch (error) {
   console.error("Error generating dump:", error.message);
