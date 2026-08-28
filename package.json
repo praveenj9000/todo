@@ -33,6 +33,8 @@
     "db:link:prod": "node scripts/db-link.mjs prod",
     "db:link:e2e": "node scripts/db-link.mjs e2e",
     "db:push:e2e": "node scripts/db-push-e2e.mjs",
+    "dump:current": "node scripts/dump-files.mjs",
+    "dump:all": "node scripts/dump-files.mjs --recursive",
     "dump:changes": "node scripts/dump-changed-files.mjs",
     "dump:commit": "node scripts/dump-commit-files.mjs",
     "test:e2e:local:setup": "node scripts/setup-e2e-local.mjs",
