@@ -1,12 +1,9 @@
-import { execSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 
-const files = execSync('git ls-files "*.ts" "*.tsx"', {
-  encoding: "utf-8",
-})
-  .split("\n")
-  .filter(Boolean)
-  .filter((file) => !file.includes("database.ts"));
+// lint-staged passes the matched staged filenames as CLI args. Falling back
+// to nothing (rather than re-implementing the old `git ls-files` scan) keeps
+// this scoped to whatever's actually being committed.
+const files = process.argv.slice(2).filter((file) => !file.includes("database.ts"));
 
 const importPattern = /import\s*\{([\s\S]*?)\}\s*from/g;
 
@@ -31,5 +28,6 @@ for (const file of files) {
   }
 }
 
-console.log(`✓ Collapsed imports in ${changedCount} file(s).`);
-console.log("Run `pnpm format` next to let Prettier finalize formatting.");
+if (changedCount > 0) {
+  console.log(`✓ Collapsed imports in ${changedCount} file(s).`);
+}

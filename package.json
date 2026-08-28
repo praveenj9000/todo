@@ -29,9 +29,10 @@
     "db:pull": "pnpm dlx supabase db pull",
     "db:reset": "pnpm dlx supabase db reset",
     "db:types": "pnpm dlx supabase gen types typescript --linked > packages/types/src/database.ts",
-    "db:new": "pnpm dlx supabase migration new",
+    "db:new": "node scripts/new-migration.mjs",
     "db:link:prod": "node scripts/db-link.mjs prod",
     "db:link:e2e": "node scripts/db-link.mjs e2e",
+    "db:push:all": "node scripts/db-push-all.mjs",
     "db:push:e2e": "node scripts/db-push-e2e.mjs",
     "dump:current": "node scripts/dump-files.mjs",
     "dump:all": "node scripts/dump-files.mjs --recursive",
@@ -63,6 +64,10 @@
     "@supabase/supabase-js": "^2.111.0"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,md}": "prettier --write"
+    "*.{ts,tsx}": [
+      "node scripts/collapse-imports.mjs",
+      "prettier --write"
+    ],
+    "*.{js,jsx,json,md}": "prettier --write"
   }
 }
