@@ -1,0 +1,137 @@
+# Database migration scripts
+
+Three environments, each backed by a different Supabase project (except
+local, which isn't a Supabase project at all — it's a Docker Postgres
+instance):
+
+| Environment | What it is | Linked via |
+|---|---|---|
+| **prod** | Live Supabase project | `.env` → `PROD_PROJECT_REF` |
+| **e2e (remote)** | Separate Supabase project used for CI/e2e | `.env.e2e` → `E2E_PROJECT_REF` |
+| **local (Docker)** | Local Supabase stack via `supabase start` | not linked — it's local |
+
+## One-time setup
+
+Add the DB password for each remote project to its matching env file
+(these are **different passwords for different projects** — don't reuse
+one across files):
+
+```dotenv
+# .env
+SUPABASE_DB_PASSWORD=<prod project's db password>
+```
+```dotenv
+# .env.e2e
+SUPABASE_DB_PASSWORD=<e2e project's db password>
+```
+
+Get/reset these from the Supabase dashboard: **Project Settings →
+Database → Database password**. Supabase doesn't let you view an
+existing one again, only reset it.
+
+**Before adding a real password to either file, confirm it's actually
+gitignored:**
+```bash
+git check-ignore -v .env .env.e2e
+```
+If either prints nothing, it is **not** ignored — fix `.gitignore`
+before writing a secret into it, not after.
+
+If `SUPABASE_DB_PASSWORD` isn't set in the relevant file, the scripts
+fall back to a masked interactive prompt — nothing will silently fail
+for missing it, but you'll be typing it every run.
+
+## Commands
+
+```bash
+pnpm db:link:prod        # link the Supabase CLI to prod
+pnpm db:link:e2e         # link the Supabase CLI to e2e
+pnpm db:push:e2e         # link e2e, push, verify, relink to prod (always, even on failure)
+pnpm db:push:all         # push to prod, then e2e, then apply pending migrations locally
+pnpm verify-migration    # compare local migration files vs whichever project is currently linked
+pnpm test:e2e:local:setup  # boot the local Docker Supabase stack (one-time / after a long gap)
+```
+
+`db:push:all` is the one you actually want most of the time — it
+covers all three environments in the right order and leaves the CLI
+linked to prod when it finishes.
+
+**There is currently no confirmation step before the prod push** —
+`db:push:all` pushes to prod immediately once run, and passes `--yes`
+to the Supabase CLI so its own confirmation prompt is skipped too. This
+was a deliberate choice, not an oversight — see the code comments in
+`db-push-all.mjs` if you want to reintroduce a gate.
+
+## How a push actually works (and why it's not a plain `supabase db push`)
+
+`supabase db push` alone hangs on two things:
+
+1. **Its own password prompt.** Under Git Bash / MINGW64 on Windows,
+   the CLI's hidden-input read for the DB password can hang
+   indefinitely with no visible prompt at all. Fix: `db-auth.mjs`
+   reads the password itself (masked, via a normal `readline` prompt)
+   and passes it straight into `--db-url`, so the CLI's own prompt for
+   it never triggers.
+2. **Its confirmation prompt.** Even with the password handled, `db
+   push` asks "Do you want to push these migrations?" via an
+   interactive TUI-style prompt (`◆ Yes / ○ No`). Left un-piped, this
+   *looks* identical to a hang — it's actually just waiting for a
+   keypress. Fix: `--yes` on the `db push` invocation skips it.
+
+On top of that, the connection string is passed via `execFileSync`
+with an **argument array**, not a single pre-quoted string via
+`execSync`. Windows wraps whatever `execSync` is given in an extra
+layer of `cmd.exe /c "..."` quoting — a manually-quoted `--db-url
+"postgresql://..."` string gets mangled by that second layer. An
+argument array lets Node do its own correct escaping instead.
+
+## Troubleshooting
+
+**Hangs with nothing printed after "Connecting to remote database..."**
+— almost certainly the CLI's own prompt (password or confirmation)
+rendering somewhere you can't see it, not a real network hang. If
+you're not using `db-push-all.mjs`/`db-push-e2e.mjs` (i.e. running
+`supabase db push` directly), add `--yes` and pass `--db-url`
+explicitly rather than relying on `SUPABASE_DB_PASSWORD` alone.
+
+**`password authentication failed for user "postgres"` (SQLSTATE
+28P01)** — the password is wrong, was recently reset, or the CLI's
+local connection cache (`supabase/.temp/`) has a stale value. Try:
+```bash
+rm -rf supabase/.temp   # macOS/Linux
+Remove-Item -Recurse -Force supabase\.temp   # Windows PowerShell
+```
+then retry. If it still fails, reset the password from the dashboard
+— don't trust a value that "looks right" without testing it fresh.
+
+**Command actually times out (genuine network issue, not a prompt)** —
+likely IPv6-only connectivity to the direct DB host
+(`db.<ref>.supabase.co`) not being reachable on this network. Get the
+pooler connection string instead: **Project Settings → Database →
+Connection string → Transaction mode (port 6543)**, and pass that as
+`--db-url` instead of the direct-host one `db-auth.mjs` builds by
+default.
+
+## Script inventory
+
+| Script | Wired to | Purpose |
+|---|---|---|
+| `db-link.mjs` | `db:link:prod`, `db:link:e2e` | Links the CLI to a target project |
+| `db-push-e2e.mjs` | `db:push:e2e` | Full e2e push cycle, always relinks to prod after |
+| `db-push-all.mjs` | `db:push:all` | Runs prod → e2e → local in sequence |
+| `verify-migration.mjs` | `verify-migration` | Diffs local migration files vs the linked project |
+| `lib/db-auth.mjs` | (shared helper, not run directly) | Password/project-ref resolution, `--db-url` construction |
+| `setup-e2e-local.mjs` | `test:e2e:local:setup` | Boots local Docker Supabase |
+| `setup.mjs` | `setup` | Project onboarding |
+| `sync-env.mjs` | `sync-env` (also runs inside `dev`/`build`) | Syncs root `.env` into `apps/app/.env` |
+| `doctor.mjs` | `check-env` | Environment sanity check |
+| `new-feature.mjs` | `new-feature` | Scaffolds a feature folder |
+| `dump-changed-files.mjs` | `dump:changes` | Dumps git-changed files to text (used to paste into AI review chats) |
+| `new-migration.mjs` | *not wired* | Validated wrapper around `supabase migration new` — `db:new` currently bypasses it and calls the CLI directly |
+| `dump-commit-files.mjs` | *not wired* | Per-commit version of `dump-changed-files.mjs`; its own header comment references a `dump:commit` script that doesn't exist in `package.json` |
+| `dump-files.mjs` | *not wired* | Generic, non-git-aware file dumper — superseded by the two above |
+| `collapse-imports.mjs` | via `lint-staged` on staged `.ts`/`.tsx` files | Collapses multi-line named imports to one line |
+
+The three "not wired" entries are known gaps, not intentional design —
+see git history / prior discussion for context if you're deciding
+whether to wire them up or delete them.

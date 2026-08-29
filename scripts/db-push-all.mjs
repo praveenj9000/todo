@@ -6,8 +6,10 @@ function handleTimeout(error, timeoutMs, label) {
     console.error(
       `\n✖ "${label}" didn't finish within ${timeoutMs / 1000}s.\n` +
         "If this is a genuine network issue (not the confirmation prompt, " +
-        "now skipped via --yes): try the pooler connection string instead " +
-        "of the direct host.\n",
+        "now skipped via --yes): could be IPv6-only connectivity to the " +
+        "direct DB host — try the pooler connection string from Project " +
+        "Settings → Database → Connection string (Transaction mode, port " +
+        "6543) instead.\n",
     );
   }
 }
@@ -33,33 +35,50 @@ function runArgs(file, args, { timeoutMs, label } = {}) {
   }
 }
 
-let failed = false;
+async function pushProd() {
+  console.log("\n=== Prod (remote) ===");
 
-try {
-  const password = await ensureDbPassword("e2e");
-  const dbUrl = buildDirectDbUrl("e2e", password);
+  const password = await ensureDbPassword("prod");
+  const dbUrl = buildDirectDbUrl("prod", password);
 
-  run("node scripts/db-link.mjs e2e");
+  run("node scripts/db-link.mjs prod");
   runArgs("pnpm", ["dlx", "supabase", "db", "push", "--db-url", dbUrl, "--yes"], {
     timeoutMs: 90_000,
     label: `pnpm dlx supabase db push --db-url "${redactDbUrl(dbUrl)}" --yes`,
   });
   run("node scripts/verify-migration.mjs");
-} catch {
-  failed = true;
 }
 
-run("node scripts/db-link.mjs prod");
-
-if (failed) {
-  console.error(
-    "\n✖ A step failed while migrating the e2e project. Relinked back to " +
-      "prod so you don't accidentally push there by mistake.\n" +
-      "To investigate, run these four commands manually:\n" +
-      "  pnpm db:link:e2e\n" +
-      "  pnpm db:push\n" +
-      "  pnpm verify-migration\n" +
-      "  pnpm db:link:prod\n",
-  );
-  process.exit(1);
+function pushE2eRemote() {
+  console.log("\n=== E2E (remote) ===");
+  run("node scripts/db-push-e2e.mjs"); // already links, pushes, verifies, relinks to prod
 }
+
+function migrateLocal() {
+  console.log("\n=== Local Supabase (Docker) ===");
+
+  try {
+    execSync("pnpm dlx supabase status", { stdio: "ignore" });
+  } catch {
+    console.error("✖ Local Supabase isn't running. Run `pnpm test:e2e:local:setup` first.");
+    process.exit(1);
+  }
+
+  run("pnpm dlx supabase migration up", { timeoutMs: 60_000 });
+  console.log("✓ Local Docker Supabase is up to date.");
+}
+
+async function main() {
+  console.log("🚀 Pushing migrations to all environments\n");
+
+  await pushProd();
+
+  delete process.env.SUPABASE_DB_PASSWORD;
+
+  pushE2eRemote();
+  migrateLocal();
+
+  console.log("\n✨ Done. CLI is linked to prod.");
+}
+
+main();
