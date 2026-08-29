@@ -136,16 +136,12 @@ export async function createTask(input: Pick<NewTask, "title" | "list_id">): Pro
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
-
   const { data, error } = await supabase
     .from("tasks")
     .insert({
       title: input.title,
       list_id: input.list_id,
-      user_id: user.id,
+      user_id: user?.id ?? null,
     })
     .select()
     .single();

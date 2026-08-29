@@ -10,6 +10,9 @@ import { getListByShareToken } from "../api/shares";
 import { useListsStore } from "../stores/lists-ui.store";
 import { TaskList } from "@/features/tasks/components/TaskList";
 import { TaskScrollProvider } from "@/features/tasks/context/TaskScrollContext";
+import { useListPermission } from "../hooks/useListPermission";
+import { AddTaskForm } from "@/features/tasks/components/AddTaskForm";
+import { TaskFilters } from "@/features/tasks/components/TaskFilters";
 
 export function ShareViewScreen() {
   const { token } = useLocalSearchParams<{ token: string }>();
@@ -24,6 +27,8 @@ export function ShareViewScreen() {
     queryFn: () => getListByShareToken(token ?? ""),
     enabled: Boolean(token),
   });
+
+  const { canEdit } = useListPermission(list?.id ?? null);
 
   useEffect(() => {
     if (list) {
@@ -55,7 +60,9 @@ export function ShareViewScreen() {
           {list.name}
         </Text>
         <YStack flex={1} minHeight={0}>
-          <TaskList />
+          {canEdit && <AddTaskForm />}
+          {canEdit && <TaskFilters />}
+          <TaskList readOnly={!canEdit} />
         </YStack>
       </YStack>
     </TaskScrollProvider>

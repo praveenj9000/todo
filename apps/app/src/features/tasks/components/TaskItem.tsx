@@ -7,9 +7,10 @@ import { TaskRow } from "./TaskRow";
 type Props = {
   task: Task;
   draggable?: boolean;
+  readOnly?: boolean;
 };
 
-export function TaskItem({ task, draggable = false }: Props) {
+export function TaskItem({ task, draggable = false, readOnly = false }: Props) {
   const { mutateAsync: updateTask } = useUpdateTask();
 
   const { mutateAsync: deleteTask } = useDeleteTask();
@@ -34,6 +35,7 @@ export function TaskItem({ task, draggable = false }: Props) {
       onToggleCompleted={toggleCompleted}
       onDelete={removeTask}
       DragHandle={draggable ? SortableHandle : undefined}
+      readOnly={readOnly}
     />
   );
 

@@ -1,52 +1,34 @@
 import { useState } from "react";
-
-import { Button, Text, XStack, YStack } from "tamagui";
+import { Button, SizableText, Tabs, YStack } from "tamagui";
 
 import { logout } from "@/features/auth";
 import { GroupsTab } from "@/features/groups";
 
-type SettingsTab = "general" | "groups";
-
-const TABS = [
-  { label: "General", value: "general" },
-  { label: "Groups", value: "groups" },
-] as const satisfies readonly { label: string; value: SettingsTab }[];
-
 export default function SettingsScreen() {
-  const [tab, setTab] = useState<SettingsTab>("general");
+  const [tab, setTab] = useState<"general" | "groups">("general");
 
   return (
     <YStack flex={1}>
-      <YStack
-        padding="$4"
-        borderBottomWidth={1}
-        borderColor="$borderColor"
-        gap="$3"
-        alignItems="center"
-      >
-        <XStack width="100%" maxWidth={640} justifyContent="space-between" alignItems="center">
-          <Text fontSize="$6" fontWeight="bold">
-            Settings
-          </Text>
-          <Button onPress={() => void logout()}>Logout</Button>
-        </XStack>
+      <Tabs value={tab} onValueChange={(value) => setTab(value as "general" | "groups")}>
+        <Tabs.List>
+          <Tabs.Tab value="general">
+            <SizableText>General</SizableText>
+          </Tabs.Tab>
+          <Tabs.Tab value="groups">
+            <SizableText>Groups</SizableText>
+          </Tabs.Tab>
+        </Tabs.List>
 
-        <XStack width="100%" maxWidth={640} gap="$2">
-          {TABS.map((item) => (
-            <Button
-              key={item.value}
-              theme={tab === item.value ? "active" : undefined}
-              onPress={() => setTab(item.value)}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </XStack>
-      </YStack>
+        <Tabs.Content value="general">
+          <YStack flex={1} justifyContent="center" alignItems="center" padding="$4">
+            <Button onPress={() => logout()}>Logout</Button>
+          </YStack>
+        </Tabs.Content>
 
-      <YStack flex={1} minHeight={0}>
-        {tab === "groups" ? <GroupsTab /> : null}
-      </YStack>
+        <Tabs.Content value="groups">
+          <GroupsTab />
+        </Tabs.Content>
+      </Tabs>
     </YStack>
   );
 }

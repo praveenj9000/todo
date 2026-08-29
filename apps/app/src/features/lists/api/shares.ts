@@ -19,15 +19,27 @@ export async function getListShares(listId: string): Promise<ListShare[]> {
 export async function addListShare(input: {
   listId: string;
   subjectType: ShareSubjectType;
-  subjectId: string;
+  email: string;
   permission: SharePermission;
 }): Promise<ListShare> {
+  const { data: userId, error: lookupError } = await supabase.rpc("find_user_id_by_email", {
+    p_email: input.email.trim(),
+  });
+
+  if (lookupError) {
+    throw lookupError;
+  }
+
+  if (!userId) {
+    throw new Error(`No account found for ${input.email}`);
+  }
+
   const { data, error } = await supabase
     .from("list_shares")
     .insert({
       list_id: input.listId,
       subject_type: input.subjectType,
-      subject_id: input.subjectId,
+      subject_id: userId,
       permission: input.permission,
     })
     .select()
@@ -92,5 +104,25 @@ export async function getListByShareToken(shareToken: string) {
     throw error;
   }
 
+  return data;
+}
+
+export async function addListShareForGroup(input: {
+  listId: string;
+  groupId: string;
+  permission: SharePermission;
+}): Promise<ListShare> {
+  const { data, error } = await supabase
+    .from("list_shares")
+    .insert({
+      list_id: input.listId,
+      subject_type: "group",
+      subject_id: input.groupId,
+      permission: input.permission,
+    })
+    .select()
+    .single();
+
+  if (error) throw error;
   return data;
 }

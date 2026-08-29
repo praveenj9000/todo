@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.15"
+    PostgrestVersion: "14.5"
   }
   graphql_public: {
     Tables: {
@@ -41,22 +41,22 @@ export type Database = {
     Tables: {
       group_members: {
         Row: {
-          created_at: string
-          email: string
+          added_at: string
           group_id: string
           id: string
+          user_id: string
         }
         Insert: {
-          created_at?: string
-          email: string
+          added_at?: string
           group_id: string
           id?: string
+          user_id: string
         }
         Update: {
-          created_at?: string
-          email?: string
+          added_at?: string
           group_id?: string
           id?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -64,6 +64,13 @@ export type Database = {
             columns: ["group_id"]
             isOneToOne: false
             referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups_with_member_count"
             referencedColumns: ["id"]
           },
         ]
@@ -222,7 +229,7 @@ export type Database = {
           sort_order: number
           title: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           completed?: boolean
@@ -233,7 +240,7 @@ export type Database = {
           sort_order?: number
           title: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           completed?: boolean
@@ -244,7 +251,7 @@ export type Database = {
           sort_order?: number
           title?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -258,9 +265,34 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      groups_with_member_count: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          member_count: number | null
+          name: string | null
+          owner_id: string | null
+          updated_at: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      add_group_member_by_email: {
+        Args: { p_email: string; p_group_id: string }
+        Returns: {
+          added_at: string
+          group_id: string
+          id: string
+          user_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "group_members"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       create_linked_task: {
         Args: { p_source_task_id: string; p_title: string }
         Returns: {
@@ -272,7 +304,7 @@ export type Database = {
           sort_order: number
           title: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -281,7 +313,21 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      find_user_id_by_email: { Args: { p_email: string }; Returns: string }
       get_connected_task_ids: { Args: { p_task_id: string }; Returns: string[] }
+      get_group_members_with_email: {
+        Args: { p_group_id: string }
+        Returns: {
+          added_at: string
+          email: string
+          id: string
+          user_id: string
+        }[]
+      }
+      get_my_list_permission: { Args: { p_list_id: string }; Returns: string }
+      is_group_member: { Args: { p_group_id: string }; Returns: boolean }
+      is_group_owner: { Args: { p_group_id: string }; Returns: boolean }
+      is_list_owner: { Args: { p_list_id: string }; Returns: boolean }
       move_task: {
         Args: { p_next_id?: string; p_prev_id?: string; p_task_id: string }
         Returns: {
@@ -293,7 +339,7 @@ export type Database = {
           sort_order: number
           title: string
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         SetofOptions: {
           from: "*"
@@ -302,6 +348,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      user_can_edit_list: { Args: { p_list_id: string }; Returns: boolean }
+      user_can_read_list: { Args: { p_list_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

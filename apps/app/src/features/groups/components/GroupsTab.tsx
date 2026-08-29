@@ -1,132 +1,93 @@
 import { useState } from "react";
+import { Button, Input, Text, XStack, YStack } from "tamagui";
 
-import { Button, ScrollView, Text, XStack, YStack } from "tamagui";
-
-import { ErrorState, Loading } from "@todo/design-system";
-
-import { useDeleteGroup } from "../hooks/useDeleteGroup";
 import { useGroups } from "../hooks/useGroups";
-import { GroupForm } from "./GroupForm";
-
-import type { GroupWithMembers } from "../types/group";
-
-const CONFIRM_TIMEOUT_MS = 3000;
+import { useGroupMutations } from "../hooks/useGroupMutations";
+import type { OptimisticGroup } from "../hooks/useGroupMutations";
+import { GroupEditor } from "./GroupEditor";
 
 export function GroupsTab() {
-  const { data: groups = [], isPending, isError, refetch } = useGroups();
-  const { mutate: deleteGroup } = useDeleteGroup();
+  const { data: groups = [] } = useGroups();
+  const { createGroupMutation, updateGroupMutation, deleteGroupMutation } = useGroupMutations();
 
-  const [creating, setCreating] = useState(false);
-  const [editing, setEditing] = useState<GroupWithMembers | null>(null);
-  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
+  const [newName, setNewName] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
-  const formOpen = creating || editing !== null;
+  function handleCreate() {
+    const value = newName.trim();
+    if (!value) return;
 
-  function handleNewGroup() {
-    setEditing(null);
-    setCreating(true);
+    setNewName("");
+    // No onSuccess jump into the editor here — the real id isn't known
+    // until the server (or, offline, a later reconnect) confirms the
+    // create. The row shows as "Saving…" in the meantime; Manage
+    // becomes available once it syncs.
+    createGroupMutation.mutate(value);
   }
 
-  function handleEditGroup(group: GroupWithMembers) {
-    setCreating(false);
-    setEditing(group);
-  }
+  const editingGroup = groups.find((g) => g.id === editingId) ?? null;
 
-  function handleCloseForm() {
-    setCreating(false);
-    setEditing(null);
-  }
-
-  function handleSaved() {
-    handleCloseForm();
-  }
-
-  function handleDeleteClick(group: GroupWithMembers) {
-    if (confirmingDeleteId !== group.id) {
-      setConfirmingDeleteId(group.id);
-      setTimeout(() => {
-        setConfirmingDeleteId((current) => (current === group.id ? null : current));
-      }, CONFIRM_TIMEOUT_MS);
-      return;
-    }
-
-    setConfirmingDeleteId(null);
-    deleteGroup(group.id);
+  if (editingGroup) {
+    return (
+      <GroupEditor
+        group={editingGroup}
+        onRename={(name) => updateGroupMutation.mutate({ id: editingGroup.id, updates: { name } })}
+        onClose={() => setEditingId(null)}
+      />
+    );
   }
 
   return (
-    <ScrollView flex={1} contentContainerStyle={{ flexGrow: 1, padding: 16 }}>
-      <YStack width="100%" maxWidth={640} alignSelf="center" gap="$4">
-        <XStack justifyContent="space-between" alignItems="center" gap="$2">
-          <Text fontWeight="bold" fontSize="$6">
-            Groups
-          </Text>
-          <Button disabled={formOpen} onPress={handleNewGroup}>
-            New group
-          </Button>
-        </XStack>
+    <YStack gap="$3" padding="$4">
+      <XStack gap="$2">
+        <Input
+          flex={1}
+          placeholder="New group name"
+          value={newName}
+          onChangeText={setNewName}
+          onSubmitEditing={handleCreate}
+        />
+        <Button onPress={handleCreate}>Create</Button>
+      </XStack>
 
-        {formOpen ? (
-          <GroupForm
-            initial={editing ?? undefined}
-            onCancel={handleCloseForm}
-            onSaved={handleSaved}
-          />
-        ) : null}
+      {createGroupMutation.error ? (
+        <Text fontSize="$2" color="$red10">
+          {(createGroupMutation.error as Error).message}
+        </Text>
+      ) : null}
 
-        {isPending ? <Loading /> : null}
+      {groups.length === 0 ? (
+        <Text color="$color11">No groups yet.</Text>
+      ) : (
+        (groups as OptimisticGroup[]).map((group) => {
+          const isPending = Boolean(group._pending);
 
-        {isError ? (
-          <ErrorState title="Could not load your groups." onRetry={() => void refetch()} />
-        ) : null}
+          return (
+            <XStack key={group.id} justifyContent="space-between" alignItems="center" gap="$2">
+              <Text flex={1}>{group.name}</Text>
 
-        {!isPending && !isError && groups.length === 0 ? (
-          <Text color="$color11" textAlign="center" paddingVertical="$6">
-            No groups yet. Create one to start organizing your team.
-          </Text>
-        ) : null}
-
-        {!isPending && !isError && groups.length > 0 ? (
-          <YStack gap="$2">
-            {groups.map((group) => {
-              const memberCount = group.group_members.length;
-
-              return (
-                <XStack
-                  key={group.id}
-                  alignItems="center"
-                  gap="$2"
-                  borderWidth={1}
-                  borderColor="$borderColor"
-                  borderRadius="$4"
-                  padding="$3"
-                >
-                  <YStack flex={1} gap="$1" minWidth={0}>
-                    <Text fontWeight="bold" numberOfLines={1}>
-                      {group.name}
-                    </Text>
-                    <Text fontSize="$2" color="$color11">
-                      {memberCount} member{memberCount === 1 ? "" : "s"}
-                    </Text>
-                  </YStack>
-
-                  <Button size="$2" disabled={formOpen} onPress={() => handleEditGroup(group)}>
-                    Edit
+              {isPending ? (
+                <Text fontSize="$2" color="$color11">
+                  Saving…
+                </Text>
+              ) : (
+                <>
+                  <Button size="$2" onPress={() => setEditingId(group.id)}>
+                    Manage
                   </Button>
                   <Button
                     size="$2"
                     theme="red"
-                    disabled={formOpen}
-                    onPress={() => handleDeleteClick(group)}
+                    onPress={() => deleteGroupMutation.mutate(group.id)}
                   >
-                    {confirmingDeleteId === group.id ? "Confirm?" : "Delete"}
+                    Delete
                   </Button>
-                </XStack>
-              );
-            })}
-          </YStack>
-        ) : null}
-      </YStack>
-    </ScrollView>
+                </>
+              )}
+            </XStack>
+          );
+        })
+      )}
+    </YStack>
   );
 }

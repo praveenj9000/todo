@@ -27,9 +27,9 @@ const emptyStateProps = {
   ),
 };
 
-export function TaskList() {
+export function TaskList({ readOnly = false }: { readOnly?: boolean }) {
   const sort = useTasksStore((state) => state.sort);
-  const isSortable = FEATURES.dragSort.enabled && sort === TASK_SORTS.MANUAL;
+  const isSortable = !readOnly && FEATURES.dragSort.enabled && sort === TASK_SORTS.MANUAL;
   const selectedListId = useListsStore((state) => state.selectedListId);
 
   const { mutate: moveTask } = useMoveTask();
@@ -61,14 +61,14 @@ export function TaskList() {
   }
 
   if (PAGINATION_MODE === "paged") {
-    return <PagedTaskList isSortable={isSortable} onReorder={handleReorder} />;
+    return <PagedTaskList isSortable={isSortable} onReorder={handleReorder} readOnly={readOnly} />;
   }
-
   return (
     <ScrollTaskList
       isSortable={isSortable}
       onReorder={handleReorder}
       infiniteScroll={PAGINATION_MODE === "infiniteScroll"}
+      readOnly={readOnly}
     />
   );
 }
@@ -77,6 +77,7 @@ function ScrollTaskList({
   isSortable,
   onReorder,
   infiniteScroll,
+  readOnly,
 }: {
   isSortable: boolean;
   onReorder: (
@@ -84,6 +85,7 @@ function ScrollTaskList({
     items: Task[],
   ) => void;
   infiniteScroll: boolean;
+  readOnly: boolean;
 }) {
   const { data, isPending, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } =
     useTasks();
@@ -136,12 +138,14 @@ function ScrollTaskList({
 function PagedTaskList({
   isSortable,
   onReorder,
+  readOnly,
 }: {
   isSortable: boolean;
   onReorder: (
     result: { itemId: string; prevId: string | null; nextId: string | null },
     items: Task[],
   ) => void;
+  readOnly: boolean;
 }) {
   const { data, isPending, isError, refetch, isFetching } = useTasksPaged();
 

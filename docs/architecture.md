@@ -455,6 +455,22 @@ Known gaps, deliberately out of scope for the current implementation:
 
 See `docs/testing-notes.md` for the `replica identity full` regression found while building this — required for DELETE/UPDATE events to be delivered correctly whenever a subscription filters on a non-primary-key column.
 
+## Sharing & Permissions
+
+- `lists` carries `share_token` (unique link), `public_read`, `public_edit`.
+- `list_shares` (`list_id`, `subject_type` in `user`/`group`, `subject_id`,
+  `permission` in `read`/`edit`) — per-subject overrides on top of the
+  public flags.
+- Access is decided by two SECURITY DEFINER helpers,
+  `user_can_read_list` / `user_can_edit_list`, called from every RLS
+  policy on `lists`/`tasks` and from `move_task`/`create_linked_task`/
+  `get_my_list_permission` — a single source of truth instead of
+  duplicating the access-rule tree per policy.
+- `public_edit` always implies read; the client enforces this too so the
+  two toggles can't be set to a contradictory state.
+- Unauthenticated viewers are always read-only unless `public_edit` is on.
+- Only the list owner can manage `list_shares` rows or delete the list.
+
 ---
 
 # Feature Lifecycle

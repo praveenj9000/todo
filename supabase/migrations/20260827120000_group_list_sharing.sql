@@ -1,14 +1,13 @@
-﻿-- Group list sharing: make list_shares rows with subject_type = 'group' actually
+-- Group list sharing: make list_shares rows with subject_type = 'group' actually
 -- grant access. Groups exist (public.groups / public.group_members) and the
 -- list_shares schema already supports subject_type = 'group', but the lists /
 -- tasks RLS policies and the move_task / create_linked_task RPCs only ever
 -- checked subject_type = 'user', so a group share granted nobody anything.
 --
 -- Membership lookup:
---   * group_members store *email addresses* (so groups can reference people
---     before they have accounts).
---   * The current user's email is read from their auth token
---     (auth.jwt() ->> 'email').
+--   * group_members reference auth.users directly (user_id), matching the
+--     schema created by 20260827091000_create_groups.sql.
+--   * The current user's id comes from their auth token (auth.uid()).
 --   * Group members may reference the list owner themselves; being a group
 --     member is not required to OWN the list, so this is purely additive.
 
@@ -29,7 +28,7 @@ as $$
         select 1
         from public.group_members
         where group_id = p_group_id
-          and lower(email) = lower(auth.jwt() ->> 'email')
+          and user_id = auth.uid()
     );
 $$;
 

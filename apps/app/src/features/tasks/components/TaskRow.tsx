@@ -16,9 +16,16 @@ type Props = {
   onToggleCompleted: () => void;
   onDelete: () => void;
   DragHandle?: DragHandleComponent;
+  readOnly?: boolean;
 };
 
-export function TaskRow({ task, onToggleCompleted, onDelete, DragHandle }: Props) {
+export function TaskRow({
+  task,
+  onToggleCompleted,
+  onDelete,
+  DragHandle,
+  readOnly = false,
+}: Props) {
   const [expanded, setExpanded] = useState(false);
 
   const { data: origin } = useTaskOrigin(task.id);
@@ -40,7 +47,7 @@ export function TaskRow({ task, onToggleCompleted, onDelete, DragHandle }: Props
           </DragHandle>
         ) : null}
 
-        <Button size="$3" onPress={onToggleCompleted}>
+        <Button size="$3" onPress={onToggleCompleted} disabled={readOnly}>
           {task.completed ? "✓" : "○"}
         </Button>
 
@@ -50,9 +57,11 @@ export function TaskRow({ task, onToggleCompleted, onDelete, DragHandle }: Props
           {expanded ? "▾" : "▸"}
         </Button>
 
-        <Button size="$3" theme="red" onPress={onDelete}>
-          Delete
-        </Button>
+        {!readOnly && (
+          <Button size="$3" theme="red" onPress={onDelete}>
+            Delete
+          </Button>
+        )}
       </XStack>
 
       {expanded ? <LinkedTasksPanel taskId={task.id} /> : null}

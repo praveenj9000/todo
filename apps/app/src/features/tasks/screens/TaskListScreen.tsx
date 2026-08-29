@@ -9,6 +9,7 @@ import { TaskFilters } from "../components/TaskFilters";
 import { TaskList } from "../components/TaskList";
 import { TaskScrollProvider } from "../context/TaskScrollContext";
 import { useTasksRealtime } from "../hooks/useTasksRealtime";
+import { useListPermission } from "@/features/lists/hooks/useListPermission";
 
 export function TaskListScreen() {
   useTasksRealtime();
@@ -17,6 +18,7 @@ export function TaskListScreen() {
   const { data: lists = [] } = useLists();
   const selectedListId = useListsStore((state) => state.selectedListId);
   const setSelectedListId = useListsStore((state) => state.setSelectedListId);
+  const { canEdit } = useListPermission(selectedListId);
 
   useEffect(() => {
     if (!selectedListId && lists.length > 0) {
@@ -30,11 +32,11 @@ export function TaskListScreen() {
         <ListSidebar />
 
         <YStack flex={1} minWidth={0}>
-          <AddTaskForm />
+          <AddTaskForm readOnly={!canEdit} />
           <TaskFilters />
 
           <YStack flex={1} minHeight={0}>
-            <TaskList />
+            <TaskList readOnly={!canEdit} />
           </YStack>
         </YStack>
       </XStack>

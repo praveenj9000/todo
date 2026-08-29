@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import {
   addListShare,
+  addListShareForGroup,
   removeListShare,
   updateListPublicAccess,
   updateListShare,
@@ -20,7 +21,7 @@ export function useShareMutations(listId: string) {
   const addShare = useMutation({
     mutationFn: (input: {
       subjectType: ShareSubjectType;
-      subjectId: string;
+      email: string;
       permission: SharePermission;
     }) => addListShare({ listId, ...input }),
     onSettled: invalidate,
@@ -43,5 +44,11 @@ export function useShareMutations(listId: string) {
     onSettled: invalidate,
   });
 
-  return { addShare, changePermission, removeShare, setPublicAccess };
+  const addShareByGroup = useMutation({
+    mutationFn: (input: { groupId: string; permission: SharePermission }) =>
+      addListShareForGroup({ listId, groupId: input.groupId, permission: input.permission }),
+    onSettled: invalidate,
+  });
+
+  return { addShare, addShareByGroup, changePermission, removeShare, setPublicAccess };
 }
