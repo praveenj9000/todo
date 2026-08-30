@@ -330,6 +330,45 @@ Delete `node_modules` and reinstall:
 pnpm install
 ```
 
+### "Unable to resolve" after installing/updating workspace dependencies
+
+When `pnpm install` adds or removes packages that live inside a workspace
+package's own `node_modules` (e.g. `@todo/design-system`'s `@tamagui/*`
+dependencies), Metro's cached file map can become stale: the new symlinks/
+junctions exist on disk, yet Metro reports `Unable to resolve "<package>"
+from "packages/design-system/src/..."`. The package is there — Metro just
+cached a crawl from before the install.
+
+Try, in order — stop as soon as one works:
+
+```bash
+pnpm --filter @todo/app exec expo start --clear
+```
+
+If that alone doesn't fix it (this has happened on Windows in this repo),
+Metro/Haste caches outside the project directory are the likely reason —
+clear those too, per Expo's own Windows troubleshooting guidance:
+
+```powershell
+rm -rf node_modules
+pnpm install
+watchman watch-del-all
+del $env:LOCALAPPDATA\Temp\haste-map-*
+del $env:LOCALAPPDATA\Temp\metro-cache
+pnpm --filter @todo/app exec expo start --clear
+```
+
+(`watchman` is optional if you don't have it installed — skip that line if
+the command isn't found.)
+
+**Not fully confirmed as root cause:** this class of symptom was diagnosed
+during real debugging where several other changes (`.npmrc` linker mode,
+Windows Developer Mode, metro.config.js resolver settings) were also made
+around the same time, so it's possible one of those was the actual fix
+rather than cache staleness. Try the cache-clear steps above first next
+time this happens — they're cheap — before reaching for anything more
+invasive.
+
 ### Expo dependency version mismatches
 
 After adding or upgrading a native dependency, check compatibility against the installed Expo SDK version:
